@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidity Dashboard | Revert Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #e6edf3;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+
+        .accent-text {
+            color: #2ea043;
+        }
+
+        /* Revert Green */
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body class="p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+            <h1 class="text-xl font-bold">Base / <span class="accent-text">Uniswap V3</span></h1>
+        </div>
+        <div class="text-sm text-gray-400">
+            Last Updated: 2026-01-23 15:06:54
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Col: Stats -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Top Stats Card -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-sm text-gray-400 mb-4 uppercase tracking-wider">Position Overview</h2>
+                <div class="grid-stats">
+                    <div>
+                        <p class="text-gray-500 text-xs">Liquidity (Raw)</p>
+                        <p class="text-2xl font-bold">10487533</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">Unclaimed Fees (0)</p>
+                        <p class="text-xl font-mono">0</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">Unclaimed Fees (1)</p>
+                        <p class="text-xl font-mono">0</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">Fee Tier</p>
+                        <span class="px-2 py-1 rounded bg-blue-900 text-blue-300 text-xs">0.05%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-sm text-gray-400 mb-4">Performance Curve</h2>
+                <canvas id="growthChart" height="100"></canvas>
+            </div>
+
+        </div>
+
+        <!-- Right Col: Details -->
+        <div class="card rounded-xl p-6 h-fit">
+            <h2 class="text-sm text-gray-400 mb-4">Asset Details</h2>
+            <div class="space-y-4">
+                <div class="flex justify-between border-b border-gray-800 pb-2">
+                    <span class="text-sm">Token 0</span>
+                    <span class="font-mono text-sm text-gray-300">USDC</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-800 pb-2">
+                    <span class="text-sm">Address</span>
+                    <span
+                        class="font-mono text-xs text-gray-500 truncate w-32">0x833589fcd6edb6e08f4c7c32d4f71b54bda02913</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-800 pb-2">
+                    <span class="text-sm">Token 1</span>
+                    <span class="font-mono text-sm text-gray-300">cbBTC</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-800 pb-2">
+                    <span class="text-sm">Address</span>
+                    <span
+                        class="font-mono text-xs text-gray-500 truncate w-32">0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf</span>
+                </div>
+
+                <div class="mt-8">
+                    <p class="text-xs text-gray-500 mb-1">Tick Range</p>
+                    <div class="flex gap-2">
+                        <span class="bg-gray-800 px-2 py-1 rounded text-xs font-mono">-70660</span>
+                        <span class="text-gray-600">-</span>
+                        <span class="bg-gray-800 px-2 py-1 rounded text-xs font-mono">-65960</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["2026-01-23 15:06:54"],
+                datasets: [{
+                    label: 'Liquidity',
+                    data: [10487533],
+                    borderColor: '#2ea043',
+                    backgroundColor: 'rgba(46, 160, 67, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { grid: { color: '#30363d' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

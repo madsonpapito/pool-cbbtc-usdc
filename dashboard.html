@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidity Tracker | USDC/cbBTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0b0e11; color: #c9d1d9; font-family: 'Inter', sans-serif; }
+        .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; }
+        .text-accent { color: #2ea043; }
+        .text-danger { color: #da3633; }
+        .text-warning { color: #d29922; }
+        .gradient-border { background: linear-gradient(135deg, #2ea043, #1f6feb); padding: 2px; border-radius: 14px; }
+        .gradient-border-inner { background: #161b22; border-radius: 12px; }
+    </style>
+</head>
+<body class="p-6 max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Liquidity Pool Tracker: <span class="text-blue-400">USDC/cbBTC</span></h1>
+            <p class="text-sm text-gray-500">NFT #4227642 | Base Network | Uniswap V3</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-green-400 text-sm font-medium">🟢 In Range</span>
+            <span class="text-gray-500 text-sm">2026-01-23 17:33</span>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row 1 - Main Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+        <div class="gradient-border">
+            <div class="gradient-border-inner p-5">
+                <p class="text-gray-500 text-xs mb-1">Pooled Assets</p>
+                <p class="text-2xl font-bold text-white">$119.90</p>
+            </div>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Total PnL</p>
+            <p class="text-2xl font-bold text-accent">
+                +$2.64
+            </p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Fee APR</p>
+            <p class="text-2xl font-bold text-yellow-400">9.09%</p>
+            <p class="text-xs text-gray-500">From fees only</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Total APR</p>
+            <p class="text-2xl font-bold text-accent">13.32%</p>
+            <p class="text-xs text-gray-500">Incl. value change</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">ROI</p>
+            <p class="text-2xl font-bold text-accent">
+                +2.22%
+            </p>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row 2 - IL & Fees -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Impermanent Loss</p>
+            <p class="text-2xl font-bold text-warning">
+                -0.08%
+            </p>
+            <p class="text-xs text-gray-500">Price ratio: 0.92x</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
+            <p class="text-2xl font-bold text-yellow-400">$1.80</p>
+            <p class="text-xs text-gray-500">Collected: $1.80 | Pending: $0.00</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
+            <p class="text-2xl font-bold text-accent">
+                +$7.15
+            </p>
+            <p class="text-xs text-gray-500">HODL value: $114.55</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">cbBTC Price</p>
+            <p class="text-2xl font-bold text-white">$89,652</p>
+            <p class="text-xs text-danger">
+                -7.6% since deposit
+            </p>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row 3 - Position Info -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Initial Investment</p>
+            <p class="text-xl font-bold text-white">$119.06</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Position Age</p>
+            <p class="text-xl font-bold text-white">60.7 days</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Deposit Date</p>
+            <p class="text-xl font-bold text-white">2025-11-24</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-gray-500 text-xs mb-1">Initial cbBTC Price</p>
+            <p class="text-xl font-bold text-white">$97,000</p>
+        </div>
+    </div>
+
+    <!-- Token Balances & Range -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="card p-5">
+            <h3 class="text-sm text-gray-400 mb-4">Token Balances</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">USDC</span>
+                    <span class="font-mono text-xl text-white">51.978417</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">cbBTC</span>
+                    <span class="font-mono text-xl text-white">0.00075759</span>
+                </div>
+            </div>
+        </div>
+        <div class="card p-5">
+            <h3 class="text-sm text-gray-400 mb-4">Price Range (cbBTC/USDC)</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-300">MIN</span>
+                    <span class="font-mono text-cyan-400">$117,103.91</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-300">MAX</span>
+                    <span class="font-mono text-cyan-400">$73,191.93</span>
+                </div>
+                <div class="flex justify-between pt-2 border-t border-gray-700">
+                    <span class="text-gray-300">Current Price</span>
+                    <span class="font-mono text-green-400">$89,574.89</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card p-6 mb-8">
+        <h3 class="text-sm font-semibold text-gray-300 mb-4">Value History</h3>
+        <canvas id="valueChart" height="100"></canvas>
+    </div>
+    
+    <!-- Summary Card -->
+    <div class="card p-6 mb-4">
+        <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 Performance Summary</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+                <p class="text-gray-500">Daily Fee Income</p>
+                <p class="text-white font-mono">$0.0297</p>
+            </div>
+            <div>
+                <p class="text-gray-500">Fees / Day (Avg)</p>
+                <p class="text-white font-mono">$0.0297</p>
+            </div>
+            <div>
+                <p class="text-gray-500">Est. Monthly Fees</p>
+                <p class="text-white font-mono">$0.89</p>
+            </div>
+            <div>
+                <p class="text-gray-500">Est. Yearly Fees</p>
+                <p class="text-white font-mono">$10.82</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Chart(document.getElementById('valueChart'), {
+            type: 'line',
+            data: {
+                labels: ["2026-01-23", "2026-01-23", "2026-01-23", "2026-01-23"],
+                datasets: [{
+                    label: 'Value USD',
+                    data: [119.89784821933989, 69.1878640082986, 119.7431143720223, 119.89784821933989],
+                    borderColor: '#2ea043',
+                    backgroundColor: 'rgba(46, 160, 67, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#21262d' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+    
