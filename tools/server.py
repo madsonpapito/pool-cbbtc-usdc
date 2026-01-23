@@ -45,9 +45,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404)
 
     def do_GET(self):
-        # Serve dashboard.html by default if root is requested
-        if self.path == '/':
-            self.path = '/dashboard.html'
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
 if __name__ == "__main__":

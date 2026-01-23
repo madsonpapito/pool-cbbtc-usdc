@@ -5,7 +5,7 @@ import math
 POSITION_FILE = "tools/position_data.json"
 HISTORY_FILE = "tools/history.json"
 CONFIG_FILE = "tools/config.json"
-OUTPUT_FILE = "dashboard.html"
+OUTPUT_FILE = "index.html"
 
 def calculate_impermanent_loss(price_ratio):
     """
