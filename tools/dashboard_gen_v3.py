@@ -106,6 +106,18 @@ def main():
     range_status = "🟢 In Range" if in_range else "🔴 Out of Range"
     range_class = "text-green-400" if in_range else "text-red-400"
 
+    # Pre-calculate performance stats for display
+    daily_fee = total_fees / max(position_age_days, 1)
+    weekly_fee = daily_fee * 7
+    monthly_fee = daily_fee * 30
+    yearly_fee = daily_fee * 365
+    
+    # Pre-calculate ROI percentages for tooltips
+    daily_roi = (daily_fee / total_invested) * 100 if total_invested > 0 else 0
+    weekly_roi = (weekly_fee / total_invested) * 100 if total_invested > 0 else 0
+    monthly_roi = (monthly_fee / total_invested) * 100 if total_invested > 0 else 0
+    yearly_roi = (yearly_fee / total_invested) * 100 if total_invested > 0 else 0
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -266,25 +278,25 @@ def main():
         <canvas id="valueChart" height="100"></canvas>
     </div>
     
-    <!-- Summary Card -->
+    <!-- Summary Card (Updated with Weekly & Tooltips) -->
     <div class="card p-6 mb-4">
         <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 Performance Summary</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-                <p class="text-gray-500">Daily Fee Income</p>
-                <p class="text-white font-mono">${(total_fees / max(position_age_days, 1)):,.4f}</p>
+            <div title="Return: {daily_roi:.4f}% of Invested">
+                <p class="text-gray-500 text-xs">Daily Fee Income</p>
+                <p class="text-white font-mono text-lg">${daily_fee:,.4f}</p>
             </div>
-            <div>
-                <p class="text-gray-500">Fees / Day (Avg)</p>
-                <p class="text-white font-mono">${(total_fees / max(position_age_days, 1)):,.4f}</p>
+            <div title="Return: {weekly_roi:.4f}% of Invested">
+                <p class="text-gray-500 text-xs">Weekly Fee Income</p>
+                <p class="text-white font-mono text-lg">${weekly_fee:,.4f}</p>
             </div>
-            <div>
-                <p class="text-gray-500">Est. Monthly Fees</p>
-                <p class="text-white font-mono">${(total_fees / max(position_age_days, 1) * 30):,.2f}</p>
+            <div title="Return: {monthly_roi:.2f}% of Invested">
+                <p class="text-gray-500 text-xs">Est. Monthly Fees</p>
+                <p class="text-white font-mono text-lg">${monthly_fee:,.2f}</p>
             </div>
-            <div>
-                <p class="text-gray-500">Est. Yearly Fees</p>
-                <p class="text-white font-mono">${(total_fees / max(position_age_days, 1) * 365):,.2f}</p>
+            <div title="Return: {yearly_roi:.2f}% of Invested">
+                <p class="text-gray-500 text-xs">Est. Yearly Fees</p>
+                <p class="text-white font-mono text-lg">${yearly_fee:,.2f}</p>
             </div>
         </div>
     </div>
