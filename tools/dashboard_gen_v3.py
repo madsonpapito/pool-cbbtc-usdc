@@ -133,6 +133,12 @@ def main():
             <p class="text-sm text-gray-500">NFT #{nft_id} | Base Network | Uniswap V3</p>
         </div>
         <div class="flex items-center gap-4">
+             <button id="syncBtn" onclick="syncData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Sync Data
+            </button>
             <span class="{range_class} text-sm font-medium">{range_status}</span>
             <span class="text-gray-500 text-sm">{now.strftime("%Y-%m-%d %H:%M")}</span>
         </div>
@@ -284,6 +290,35 @@ def main():
     </div>
 
     <script>
+        async function syncData() {{
+            const btn = document.getElementById('syncBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Syncing...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {{
+                const response = await fetch('/api/sync', {{ method: 'POST' }});
+                const data = await response.json();
+                
+                if (data.success) {{
+                    alert('Sync complete! Refreshing page...');
+                    window.location.reload();
+                }} else {{
+                    alert('Error: ' + data.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }}
+            }} catch (error) {{
+                console.error('Error:', error);
+                alert('Connection failed. Make sure server.py is running.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }}
+        }}
+
         new Chart(document.getElementById('valueChart'), {{
             type: 'line',
             data: {{
@@ -309,7 +344,7 @@ def main():
 </body>
 </html>
     """
-
+    
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Dashboard generated with correct values: {OUTPUT_FILE}")

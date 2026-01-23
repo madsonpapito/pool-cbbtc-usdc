@@ -25,8 +25,14 @@
             <p class="text-sm text-gray-500">NFT #4227642 | Base Network | Uniswap V3</p>
         </div>
         <div class="flex items-center gap-4">
+             <button id="syncBtn" onclick="syncData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Sync Data
+            </button>
             <span class="text-green-400 text-sm font-medium">🟢 In Range</span>
-            <span class="text-gray-500 text-sm">2026-01-23 17:33</span>
+            <span class="text-gray-500 text-sm">2026-01-23 17:51</span>
         </div>
     </div>
 
@@ -158,11 +164,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
                 <p class="text-gray-500">Daily Fee Income</p>
-                <p class="text-white font-mono">$0.0297</p>
+                <p class="text-white font-mono">$0.0296</p>
             </div>
             <div>
                 <p class="text-gray-500">Fees / Day (Avg)</p>
-                <p class="text-white font-mono">$0.0297</p>
+                <p class="text-white font-mono">$0.0296</p>
             </div>
             <div>
                 <p class="text-gray-500">Est. Monthly Fees</p>
@@ -176,6 +182,35 @@
     </div>
 
     <script>
+        async function syncData() {
+            const btn = document.getElementById('syncBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Syncing...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                const response = await fetch('/api/sync', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Sync complete! Refreshing page...');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Connection failed. Make sure server.py is running.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
         new Chart(document.getElementById('valueChart'), {
             type: 'line',
             data: {
