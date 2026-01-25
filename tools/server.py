@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-PORT = 8080
+PORT = 3333
 DIRECTORY = "."
 
 class Handler(http.server.SimpleHTTPRequestHandler):

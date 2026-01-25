@@ -28,7 +28,7 @@ def main():
             sys.exit(1)
             
     elapsed = time.time() - start_time
-    print(f"\n✅ Sync completed in {elapsed:.2f} seconds.")
+    print(f"\nSync completed in {elapsed:.2f} seconds.")
 
 if __name__ == "__main__":
     main()
