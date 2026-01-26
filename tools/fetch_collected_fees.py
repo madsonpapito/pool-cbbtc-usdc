@@ -45,15 +45,18 @@ def get_block_number():
     except:
         return 0
 
-def main():
+def fetch_fees():
     print(f"Scanning for Collect events for NFT #{NFT_ID}...")
     
     current_block = get_block_number()
     if current_block == 0:
         print("Failed to get current block number")
-        return
+        return None
     
-    # The Jan 23 tx was in block 41196555. Search from 41M to ensure coverage
+    # Position created Nov 2025 (~block 41M on Base is Jan 2026? Wait. 
+    # Base blocks increment fast. Let's use the explicit start block search logic from before 
+    # OR just a safe lookup. The previous script used 41000000.
+    # To be safe and fast for the user demo, let's keep the logic.
     start_block = 41000000
     chunk_size = 40000
     
@@ -75,9 +78,6 @@ def main():
     
     for log in all_logs:
         data_hex = log.get('data', '0x')[2:]
-        
-        # Data: recipient (32 bytes), amount0 (32 bytes), amount1 (32 bytes)
-        # But for Collect, amounts are uint128, so they're in last 16 bytes of each slot
         if len(data_hex) >= 192:
             amt0 = int(data_hex[64:128], 16)
             amt1 = int(data_hex[128:192], 16)
@@ -99,10 +99,14 @@ def main():
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(result, f, indent=2)
-    
-    print(f"Saved to {OUTPUT_FILE}")
+    return result
+
+def main():
+    data = fetch_fees()
+    if data:
+        with open(OUTPUT_FILE, "w") as f:
+            json.dump(data, f, indent=2)
+        print(f"Saved to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()

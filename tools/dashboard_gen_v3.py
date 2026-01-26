@@ -318,6 +318,15 @@ def main():
         async function syncData() {{
             const btn = document.getElementById('syncBtn');
             const originalText = btn.innerHTML;
+            
+            // Check if running on Vercel (not localhost)
+            const isVercel = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
+            
+            if (isVercel) {{
+                alert('Sync só funciona localmente.\\n\\nPara atualizar os dados no Vercel:\\n1. Execute python tools/sync.py no seu PC\\n2. Faça git push para atualizar');
+                return;
+            }}
+            
             btn.innerHTML = 'Syncing...';
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');

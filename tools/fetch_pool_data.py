@@ -72,7 +72,7 @@ def get_cbbtc_price():
     except:
         return 97000.0
 
-def main():
+def fetch_data():
     print(f"Fetching REAL Data for NFT #{TOKEN_ID}...")
     
     # 1. Fetch Position Data
@@ -81,7 +81,7 @@ def main():
     
     if not res_pos or res_pos == "0x":
         print("Failed to fetch position.")
-        return
+        return None
 
     raw = res_pos[2:]
     words = [raw[i:i+64] for i in range(0, len(raw), 64)]
@@ -189,7 +189,7 @@ def main():
     print(f"Price Range: {price_lower:,.2f} - {price_upper:,.2f} cbBTC/USDC")
     print(f"Current Price: {price_current:,.2f} cbBTC/USDC")
 
-    # Save
+    # Result Dict
     output = {
         "token0": token0_addr, "token1": token1_addr,
         "symbol0": symbol0, "symbol1": symbol1,
@@ -205,10 +205,14 @@ def main():
         "price_current": price_current
     }
     
-    with open("tools/position_data.json", "w") as f:
-        json.dump(output, f, indent=2)
-    print("\nSaved to tools/position_data.json")
+    return output
 
+def main():
+    data = fetch_data()
+    if data:
+        with open("tools/position_data.json", "w") as f:
+            json.dump(data, f, indent=2)
+        print("\nSaved to tools/position_data.json")
 
 if __name__ == "__main__":
     main()

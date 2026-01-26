@@ -1,2 +1,5 @@
-web3
+streamlit
+pandas
+plotly
 requests
+web3

@@ -7,16 +7,16 @@
   "liquidity": 18080007,
   "tick_lower": -70660,
   "tick_upper": -65960,
-  "current_tick": -67791,
+  "current_tick": -67782,
   "in_range": true,
-  "amount0": 46.86939534205486,
-  "amount1": 0.0008151702230656118,
-  "price_cbbtc": 87934,
-  "value_usd": 118.55057373710636,
+  "amount0": 46.62550570501602,
+  "amount1": 0.0008179464109237586,
+  "price_cbbtc": 87858,
+  "value_usd": 118.4886414759556,
   "fees_usd": 0.000796,
   "unclaimed_0": 796,
   "unclaimed_1": 0,
   "price_lower": 117103.90651575601,
   "price_upper": 73191.92707253304,
-  "price_current": 87897.90536005811
+  "price_current": 87818.83678479267
 }
