@@ -235,6 +235,39 @@ def main():
         st.text(f"Initial Investment: ${total_invested:,.2f}")
         st.text(f"Initial Price: ${initial_price:,.0f}")
         
+        st.divider()
+        
+        st.subheader("Yield Projections")
+        # Calculate Averages (Based on historical performance)
+        avg_daily = total_fees / days_active if days_active > 0 else 0
+        avg_weekly = avg_daily * 7
+        avg_monthly = avg_daily * 30
+        avg_yearly = avg_daily * 365
+        
+        # Display as a clean table or small metrics
+        st.markdown(f"""
+        <div style="background-color: #21262d; padding: 10px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #8b949e;">Daily:</span>
+                <span style="color: #2ea043; font-weight: bold;">${avg_daily:,.2f}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #8b949e;">Weekly:</span>
+                <span style="color: #2ea043; font-weight: bold;">${avg_weekly:,.2f}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #8b949e;">Monthly:</span>
+                <span style="color: #2ea043; font-weight: bold;">${avg_monthly:,.2f}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #8b949e;">Yearly:</span>
+                <span style="color: #2ea043; font-weight: bold;">${avg_yearly:,.2f}</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.divider()
+        
         st.subheader("Token Balances")
         st.text(f"{symbol0}: {amount0:.6f}")
         st.text(f"{symbol1}: {amount1:.8f}")
