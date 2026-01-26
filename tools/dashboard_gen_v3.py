@@ -5,28 +5,23 @@ import math
 POSITION_FILE = "tools/position_data.json"
 HISTORY_FILE = "tools/history.json"
 CONFIG_FILE = "tools/config.json"
+FEES_FILE = "tools/fees_data.json"
 OUTPUT_FILE = "index.html"
 
 def calculate_impermanent_loss(price_ratio):
     """
     Calculate Impermanent Loss based on price change ratio.
-    price_ratio = current_price / initial_price
-    IL = 2 * sqrt(price_ratio) / (1 + price_ratio) - 1
-    Returns a percentage (negative = loss)
     """
-    if price_ratio <= 0:
-        return 0
+    if price_ratio <= 0: return 0
     sqrt_ratio = math.sqrt(price_ratio)
     il = 2 * sqrt_ratio / (1 + price_ratio) - 1
-    return il * 100  # Convert to percentage
+    return il * 100
 
 def calculate_fee_apr(total_fees, position_value, days_active):
     """
     Calculate Fee APR (annualized return from fees only)
-    APR = (fees / principal) * (365 / days)
     """
-    if position_value <= 0 or days_active <= 0:
-        return 0
+    if position_value <= 0 or days_active <= 0: return 0
     daily_rate = (total_fees / position_value) / days_active
     apr = daily_rate * 365 * 100
     return apr
@@ -34,19 +29,29 @@ def calculate_fee_apr(total_fees, position_value, days_active):
 def main():
     # Load Data
     try:
-        with open(POSITION_FILE, "r") as f:
-            pos = json.load(f)
-        with open(HISTORY_FILE, "r") as f:
-            history = json.load(f)
-        with open(CONFIG_FILE, "r") as f:
-            config = json.load(f)
+        with open(POSITION_FILE, "r") as f: pos = json.load(f)
+        with open(HISTORY_FILE, "r") as f: history = json.load(f)
+        with open(CONFIG_FILE, "r") as f: config = json.load(f)
     except FileNotFoundError as e:
         print(f"Missing file: {e}")
         return
 
+    # Load Automated Fees (Optional)
+    collected_usdc = 0.0
+    collected_cbbtc = 0.0
+    try:
+        with open(FEES_FILE, "r") as f:
+            fees_data = json.load(f)
+            collected_usdc = fees_data.get('total_collected_usdc', 0)
+            collected_cbbtc = fees_data.get('total_collected_cbbtc', 0)
+            print(f"Loaded automated fees: {collected_usdc} USDC, {collected_cbbtc} cbBTC")
+    except FileNotFoundError:
+        print("Fees data not found, using manual config if available.")
+        collected_usdc = config.get("fees_collected_usd", 0.0) # Fallback
+
     # Real values
     value_usd = pos.get('value_usd', 0)
-    fees_usd = pos.get('fees_usd', 0)
+    fees_usd = pos.get('fees_usd', 0) # Pending
     amount0 = pos.get('amount0', 0)
     amount1 = pos.get('amount1', 0)
     symbol0 = pos.get('symbol0', 'Token0')
@@ -61,44 +66,39 @@ def main():
     total_invested = config.get("total_invested_usd", 69.06)
     deposit_date = config.get("deposit_date", "2025-11-24")
     nft_id = config.get("nft_id", 4227642)
-    fees_collected = config.get("fees_collected_usd", 0.0)  # Manually tracked
-    initial_cbbtc_price = config.get("initial_cbbtc_price", 97000)  # Price at deposit
+    initial_cbbtc_price = config.get("initial_cbbtc_price", 97000)
+    
+    # Calculate Collected Fees Value (at current price)
+    # USDC is stable (1.0), cbBTC is price_cbbtc
+    fees_collected_value = (collected_usdc * 1.0) + (collected_cbbtc * price_cbbtc)
+    
+    # Total fees (Collected + Pending)
+    total_fees = fees_usd + fees_collected_value
     
     # Calculate Position Age
     deposit_dt = datetime.datetime.strptime(deposit_date, "%Y-%m-%d")
     now = datetime.datetime.now()
     position_age_days = (now - deposit_dt).days + (now - deposit_dt).seconds / 86400
     
-    # Total fees (unclaimed + collected)
-    total_fees = fees_usd + fees_collected
-    
-    # Calculate PnL and ROI (including collected fees)
+    # Calculate PnL and ROI
     net_pnl = value_usd - total_invested + total_fees
     roi_percent = (net_pnl / total_invested) * 100 if total_invested > 0 else 0
     
-    # ===== IMPROVED APR CALCULATION =====
-    # Fee APR: Annualized return from fees only
+    # APRs
     fee_apr = calculate_fee_apr(total_fees, total_invested, position_age_days)
-    
-    # Total APR: Annualized total return (including value change)
     total_apr = (roi_percent / position_age_days) * 365 if position_age_days > 0 else 0
     
-    # ===== IMPERMANENT LOSS CALCULATION =====
-    # IL based on price change since deposit
+    # IL
     price_ratio = price_cbbtc / initial_cbbtc_price if initial_cbbtc_price > 0 else 1
     il_percent = calculate_impermanent_loss(price_ratio)
     
-    # HODL value (if you just held 50/50 instead of LP)
-    # Assuming 50% was in cbBTC and 50% in USDC at deposit
-    initial_btc_portion = total_invested * 0.5
-    initial_usdc_portion = total_invested * 0.5
-    hodl_value = (initial_btc_portion * price_ratio) + initial_usdc_portion
-    hodl_pnl = hodl_value - total_invested
-    
-    # LP vs HODL comparison
+    # LP vs HODL
+    initial_btc = (total_invested * 0.5) / initial_cbbtc_price
+    initial_usdc = total_invested * 0.5
+    hodl_value = (initial_btc * price_cbbtc) + initial_usdc
     lp_vs_hodl = (value_usd + total_fees) - hodl_value
     
-    # History for charts
+    # History for value chart
     dates = [h.get('date', '').split(" ")[0] for h in history] if history else [now.strftime("%Y-%m-%d")]
     values = [h.get('value_usd', value_usd) if 'value_usd' in h else value_usd for h in history] if history else [value_usd]
     
@@ -106,13 +106,12 @@ def main():
     range_status = "🟢 In Range" if in_range else "🔴 Out of Range"
     range_class = "text-green-400" if in_range else "text-red-400"
 
-    # Pre-calculate performance stats for display
+    # Projections
     daily_fee = total_fees / max(position_age_days, 1)
     weekly_fee = daily_fee * 7
     monthly_fee = daily_fee * 30
     yearly_fee = daily_fee * 365
     
-    # Pre-calculate ROI percentages for tooltips
     daily_roi = (daily_fee / total_invested) * 100 if total_invested > 0 else 0
     weekly_roi = (weekly_fee / total_invested) * 100 if total_invested > 0 else 0
     monthly_roi = (monthly_fee / total_invested) * 100 if total_invested > 0 else 0
@@ -199,8 +198,14 @@ def main():
         </div>
         <div class="card p-5">
             <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
-            <p class="text-2xl font-bold text-yellow-400">${total_fees:,.2f}</p>
-            <p class="text-xs text-gray-500">Collected: ${fees_collected:,.2f} | Pending: ${fees_usd:,.2f}</p>
+            <div class="flex items-baseline gap-2">
+                 <p class="text-2xl font-bold text-yellow-400">${total_fees:,.2f}</p>
+                 <span class="text-xs text-gray-500">(All Time)</span>
+            </div>
+            <div class="text-xs text-gray-500 mt-1 flex flex-col">
+                <span>collected: <span class="text-gray-300">${fees_collected_value:,.2f}</span></span>
+                 <span>pending: <span class="text-gray-300">${fees_usd:,.2f}</span></span>
+            </div>
         </div>
         <div class="card p-5">
             <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
@@ -278,7 +283,7 @@ def main():
         <canvas id="valueChart" height="100"></canvas>
     </div>
     
-    <!-- Summary Card (Updated with Weekly & Tooltips) -->
+    <!-- Summary Card -->
     <div class="card p-6 mb-4">
         <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 Performance Summary</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -301,6 +306,7 @@ def main():
         </div>
     </div>
 
+    <!-- Sync Logic -->
     <script>
         async function syncData() {{
             const btn = document.getElementById('syncBtn');

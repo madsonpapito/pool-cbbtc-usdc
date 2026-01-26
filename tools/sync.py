@@ -18,6 +18,7 @@ def main():
     
     steps = [
         "fetch_pool_data.py",
+        "fetch_collected_fees.py",
         "update_history.py",
         "dashboard_gen_v3.py"
     ]
