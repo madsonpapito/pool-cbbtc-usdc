@@ -72,6 +72,13 @@ def main():
     # USDC is stable (1.0), cbBTC is price_cbbtc
     fees_collected_value = (collected_usdc * 1.0) + (collected_cbbtc * price_cbbtc)
     
+    # Pending fees from unclaimed tokens
+    unclaimed_0 = pos.get('unclaimed_0', 0)  # Raw USDC (6 decimals)
+    unclaimed_1 = pos.get('unclaimed_1', 0)  # Raw cbBTC (8 decimals)
+    pending_usdc = unclaimed_0 / 1e6
+    pending_cbbtc = unclaimed_1 / 1e8
+    fees_usd = (pending_usdc * 1.0) + (pending_cbbtc * price_cbbtc)
+    
     # Total fees (Collected + Pending)
     total_fees = fees_usd + fees_collected_value
     
@@ -196,7 +203,7 @@ def main():
             </p>
             <p class="text-xs text-gray-500">Price ratio: {price_ratio:.2f}x</p>
         </div>
-        <div class="card p-5">
+        <div class="card p-5" title="Collected: {collected_usdc:.4f} USDC + {collected_cbbtc:.8f} cbBTC&#10;Pending: {pending_usdc:.4f} USDC + {pending_cbbtc:.8f} cbBTC">
             <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
             <div class="flex items-baseline gap-2">
                  <p class="text-2xl font-bold text-yellow-400">${total_fees:,.2f}</p>
