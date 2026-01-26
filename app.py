@@ -163,13 +163,13 @@ def metric_card(title, value, sub_value=None, sub_color="green", tooltip=None):
     
     tooltip_attr = f'title="{tooltip}"' if tooltip else ""
     
-    st.markdown(textwrap.dedent(f"""
-    <div class="dashboard-card" {tooltip_attr}>
-        <div class="card-title">{title}</div>
-        <div class="card-value">{value}</div>
-        {sub_html}
-    </div>
-    """), unsafe_allow_html=True)
+    st.markdown(f"""
+<div class="dashboard-card" {tooltip_attr}>
+<div class="card-title">{title}</div>
+<div class="card-value">{value}</div>
+{sub_html}
+</div>
+""", unsafe_allow_html=True)
 
 # Main App
 def main():
@@ -218,22 +218,22 @@ def main():
     # --- Header Section ---
     c1, c2 = st.columns([3, 1])
     with c1:
-        st.markdown(textwrap.dedent(f"""
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #2775ca, #8c4eee);"></div>
-            <h1 style="margin: 0; font-size: 1.5rem;">{symbol0} / <span style="color: #2ea043;">{symbol1}</span></h1>
-            <span class="bg-badge">Uniswap V3</span>
-        </div>
-        <p style="color: #8b949e; margin-top: 5px; font-size: 0.9rem;">Targeting {price_lower:,.0f} - {price_upper:,.0f} {symbol0}/{symbol1}</p>
-        """), unsafe_allow_html=True)
+        st.markdown(f"""
+<div style="display: flex; align-items: center; gap: 10px;">
+<div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #2775ca, #8c4eee);"></div>
+<h1 style="margin: 0; font-size: 1.5rem;">{symbol0} / <span style="color: #2ea043;">{symbol1}</span></h1>
+<span class="bg-badge">Uniswap V3</span>
+</div>
+<p style="color: #8b949e; margin-top: 5px; font-size: 0.9rem;">Targeting {price_lower:,.0f} - {price_upper:,.0f} {symbol0}/{symbol1}</p>
+""", unsafe_allow_html=True)
     with c2:
         status_color = "#2ea043" if in_range else "#da3633"
         status_text = "IN RANGE" if in_range else "OUT OF RANGE"
-        st.markdown(textwrap.dedent(f"""
-        <div style="text-align: right; margin-bottom: 10px;">
-            <span style="color: {status_color}; font-weight: bold; font-family: monospace; border: 1px solid {status_color}; padding: 4px 8px; border-radius: 4px;">● {status_text}</span>
-        </div>
-        """), unsafe_allow_html=True)
+        st.markdown(f"""
+<div style="text-align: right; margin-bottom: 10px;">
+<span style="color: {status_color}; font-weight: bold; font-family: monospace; border: 1px solid {status_color}; padding: 4px 8px; border-radius: 4px;">● {status_text}</span>
+</div>
+""", unsafe_allow_html=True)
         if st.button("🔄 Sync Data", use_container_width=True):
             sync_data()
 
@@ -305,39 +305,38 @@ def main():
 
     with row2_col2:
         # Asset Breakdown Card
-        st.markdown(textwrap.dedent(f"""
-        <div class="dashboard-card">
-            <div class="card-title">Asset Breakdown</div>
-            <div style="margin-top: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #8b949e;">{symbol0}</span>
-                    <span style="font-family: monospace;">{amount0:,.2f}</span>
-                </div>
-                <div style="height: 4px; background: #30363d; border-radius: 2px; overflow: hidden; margin-bottom: 15px;">
-                    <div style="width: 50%; height: 100%; background: #2775ca;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #8b949e;">{symbol1}</span>
-                    <span style="font-family: monospace;">{amount1:,.6f}</span>
-                </div>
-                <div style="height: 4px; background: #30363d; border-radius: 2px; overflow: hidden; margin-bottom: 15px;">
-                    <div style="width: 50%; height: 100%; background: #8c4eee;"></div>
-                </div>
-            </div>
-            
-            <div style="border-top: 1px solid #30363d; margin: 15px 0; padding-top: 15px;">
-                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span style="color: #8b949e; font-size: 0.8rem;">LP vs HODL</span>
-                    <span style="color: {'#2ea043' if lp_vs_hodl >= 0 else '#da3633'}; font-family: monospace;">${lp_vs_hodl:+.2f}</span>
-                </div>
-                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #8b949e; font-size: 0.8rem;">Current Price</span>
-                    <span style="font-family: monospace;">${price_cbbtc:,.0f}</span>
-                </div>
-            </div>
-        </div>
-        """), unsafe_allow_html=True)
+        # Asset Breakdown Card
+        st.markdown(f"""
+<div class="dashboard-card">
+<div class="card-title">Asset Breakdown</div>
+<div style="margin-top: 15px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<span style="color: #8b949e;">{symbol0}</span>
+<span style="font-family: monospace;">{amount0:,.2f}</span>
+</div>
+<div style="height: 4px; background: #30363d; border-radius: 2px; overflow: hidden; margin-bottom: 15px;">
+<div style="width: 50%; height: 100%; background: #2775ca;"></div>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<span style="color: #8b949e;">{symbol1}</span>
+<span style="font-family: monospace;">{amount1:,.6f}</span>
+</div>
+<div style="height: 4px; background: #30363d; border-radius: 2px; overflow: hidden; margin-bottom: 15px;">
+<div style="width: 50%; height: 100%; background: #8c4eee;"></div>
+</div>
+</div>
+<div style="border-top: 1px solid #30363d; margin: 15px 0; padding-top: 15px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+<span style="color: #8b949e; font-size: 0.8rem;">LP vs HODL</span>
+<span style="color: {'#2ea043' if lp_vs_hodl >= 0 else '#da3633'}; font-family: monospace;">${lp_vs_hodl:+.2f}</span>
+</div>
+<div style="display: flex; justify-content: space-between;">
+<span style="color: #8b949e; font-size: 0.8rem;">Current Price</span>
+<span style="font-family: monospace;">${price_cbbtc:,.0f}</span>
+</div>
+</div>
+</div>
+""", unsafe_allow_html=True)
 
     # --- Yield Projections ---
     avg_daily = total_fees / days_active if days_active > 0 else 0
@@ -352,12 +351,12 @@ def main():
     cols = [p1, p2, p3]
     for i, (period, val) in enumerate(projections.items()):
         with cols[i]:
-            st.markdown(textwrap.dedent(f"""
-            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: center;">
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">{period}</div>
-                <div style="color: #2ea043; font-size: 1.2rem; font-weight: bold; margin-top: 5px;">${val:,.2f}</div>
-            </div>
-            """), unsafe_allow_html=True)
+            st.markdown(f"""
+<div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: center;">
+<div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">{period}</div>
+<div style="color: #2ea043; font-size: 1.2rem; font-weight: bold; margin-top: 5px;">${val:,.2f}</div>
+</div>
+""", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
