@@ -163,13 +163,13 @@ def metric_card(title, value, sub_value=None, sub_color="green", tooltip=None):
     
     tooltip_attr = f'title="{tooltip}"' if tooltip else ""
     
-    st.markdown(f"""
+    st.markdown(textwrap.dedent(f"""
     <div class="dashboard-card" {tooltip_attr}>
         <div class="card-title">{title}</div>
         <div class="card-value">{value}</div>
         {sub_html}
     </div>
-    """, unsafe_allow_html=True)
+    """), unsafe_allow_html=True)
 
 # Main App
 def main():
@@ -249,8 +249,24 @@ def main():
     with col3:
         metric_card("Total APR", f"{total_apr:.1f}%", f"Fee APR: {fee_apr:.1f}%", "green")
     with col4:
-        metric_card("Total Fees", f"${total_fees:,.2f}", f"Pending: ${fees_pending_value:,.2f}", "green", 
-                    f"Collected: ${fees_collected_value:,.2f}")
+        metric_card("Total Fees", f"${total_fees:,.2f}", f"Collected: ${fees_collected_value:,.2f}", "green")
+
+    # --- Position Stats Row ---
+    st.markdown("### Position Stats")
+    s1, s2, s3, s4 = st.columns(4)
+    with s1:
+        # Liquidity (Raw)
+        liquidity = pos.get('liquidity', 0)
+        metric_card("Liquidity (Raw)", f"{liquidity:,}", "Active Liquidity", "gray")
+    with s2:
+        # Unclaimed USDC
+        metric_card("Unclaimed USDC", f"${unclaimed_0:,.2f}", f"{unclaimed_0:.4f} USDC", "green")
+    with s3:
+        # Unclaimed cbBTC
+        metric_card("Unclaimed cbBTC", f"${unclaimed_1 * price_cbbtc:,.2f}", f"{unclaimed_1:.6f} cbBTC", "green")
+    with s4:
+        # Fee Tier
+        metric_card("Fee Tier", "0.05%", "Uniswap V3", "gray")
 
     # --- Main Content: Chart & Details ---
     row2_col1, row2_col2 = st.columns([2, 1])
