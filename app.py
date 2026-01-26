@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import datetime
 import math
+import textwrap
 import plotly.graph_objects as go
 from tools.fetch_pool_data import fetch_data
 from tools.fetch_collected_fees import fetch_fees
@@ -217,22 +218,22 @@ def main():
     # --- Header Section ---
     c1, c2 = st.columns([3, 1])
     with c1:
-        st.markdown(f"""
+        st.markdown(textwrap.dedent(f"""
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #2775ca, #8c4eee);"></div>
             <h1 style="margin: 0; font-size: 1.5rem;">{symbol0} / <span style="color: #2ea043;">{symbol1}</span></h1>
             <span class="bg-badge">Uniswap V3</span>
         </div>
         <p style="color: #8b949e; margin-top: 5px; font-size: 0.9rem;">Targeting {price_lower:,.0f} - {price_upper:,.0f} {symbol0}/{symbol1}</p>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
     with c2:
         status_color = "#2ea043" if in_range else "#da3633"
         status_text = "IN RANGE" if in_range else "OUT OF RANGE"
-        st.markdown(f"""
+        st.markdown(textwrap.dedent(f"""
         <div style="text-align: right; margin-bottom: 10px;">
             <span style="color: {status_color}; font-weight: bold; font-family: monospace; border: 1px solid {status_color}; padding: 4px 8px; border-radius: 4px;">● {status_text}</span>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
         if st.button("🔄 Sync Data", use_container_width=True):
             sync_data()
 
@@ -288,7 +289,7 @@ def main():
 
     with row2_col2:
         # Asset Breakdown Card
-        st.markdown(f"""
+        st.markdown(textwrap.dedent(f"""
         <div class="dashboard-card">
             <div class="card-title">Asset Breakdown</div>
             <div style="margin-top: 15px;">
@@ -320,7 +321,7 @@ def main():
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
     # --- Yield Projections ---
     avg_daily = total_fees / days_active if days_active > 0 else 0
@@ -335,12 +336,12 @@ def main():
     cols = [p1, p2, p3]
     for i, (period, val) in enumerate(projections.items()):
         with cols[i]:
-            st.markdown(f"""
+            st.markdown(textwrap.dedent(f"""
             <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: center;">
                 <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">{period}</div>
                 <div style="color: #2ea043; font-size: 1.2rem; font-weight: bold; margin-top: 5px;">${val:,.2f}</div>
             </div>
-            """, unsafe_allow_html=True)
+            """), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
