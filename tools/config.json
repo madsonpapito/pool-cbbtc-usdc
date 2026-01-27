@@ -1,9 +1,8 @@
 {
-    "total_invested_usd": 119.16,
+    "total_invested_usd": 118.65,
     "deposit_date": "2025-11-24",
     "last_deposit_date": "2026-01-23",
     "last_deposit_amount": 50.04,
-    "deposit_timestamp": 1732485360,
     "nft_id": 4227642,
     "fees_collected_usd": 0.00,
     "initial_cbbtc_price": 88685
