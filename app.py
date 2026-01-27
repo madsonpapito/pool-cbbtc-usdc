@@ -172,6 +172,14 @@ def sync_data():
         pos_data = fetch_data()
         fees_data = fetch_fees()
         if pos_data:
+            # Save latest data
+            with open("tools/position_data.json", "w") as f:
+                json.dump(pos_data, f, indent=2)
+            
+            if fees_data:
+                with open("tools/fees_data.json", "w") as f:
+                    json.dump(fees_data, f, indent=2)
+
             try:
                 with open("tools/history.json", "r") as f: history = json.load(f)
             except: history = []
@@ -189,6 +197,7 @@ def sync_data():
             }
             history.append(snapshot)
             with open("tools/history.json", "w") as f: json.dump(history, f, indent=2)
+            
             st.cache_data.clear()
             st.rerun()
 
