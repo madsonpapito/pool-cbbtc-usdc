@@ -148,8 +148,17 @@ def fetch_data():
     print(f"{symbol1}: {amount1:.8f}")
     
     # 5. Get Prices
-    price_cbbtc = get_cbbtc_price()
-    print(f"cbBTC Price: ${price_cbbtc:,.2f}")
+    # Calculate price from pool tick (most accurate for LP)
+    # Price of token0 (USDC) in token1 (cbBTC)
+    price_t0_in_t1 = float(Decimal("1.0001") ** Decimal(current_tick))
+    # Adjust for decimals: USDC=6, cbBTC=8
+    price_t0_in_t1 *= 10 ** (DECIMALS_USDC - DECIMALS_CBBTC)
+    
+    price_cbbtc = 0
+    if price_t0_in_t1 != 0:
+        price_cbbtc = 1 / price_t0_in_t1
+        
+    print(f"cbBTC Price (Pool): ${price_cbbtc:,.2f}")
     
     # Calculate USD
     if symbol0 == "USDC":
