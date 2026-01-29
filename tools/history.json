@@ -499,5 +499,33 @@
     "value_usd": 118.35841885827496,
     "fees_usd": 0.000796,
     "price_cbbtc": 87699
+  },
+  {
+    "token0": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "token1": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "fee": 500,
+    "liquidity": 48380790,
+    "tick_lower": -70660,
+    "tick_upper": -65960,
+    "current_tick": -67301,
+    "in_range": true,
+    "amount0": 90.71089991613322,
+    "amount1": 0.0025860321906969845,
+    "price_cbbtc": 83694.93186253516,
+    "value_usd": 307.14868791083984,
+    "fees_usd": 0.027022138416630974,
+    "unclaimed_0": 12794,
+    "unclaimed_1": 17,
+    "price_lower": 117103.90651575601,
+    "price_upper": 73191.92707253304,
+    "price_current": 83694.93186253516,
+    "timestamp": 1769711264,
+    "date": "2026-01-29 18:27:44",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 98000.0
+    }
   }
 ]
