@@ -7,7 +7,16 @@ getcontext().prec = 50
 
 # Configuration
 RPC_URL = "https://mainnet.base.org"
-TOKEN_ID = 4227642
+
+def get_token_id(config_path="tools/config.json"):
+    try:
+        with open(config_path, "r") as f:
+            return json.load(f).get("nft_id", 4227642)
+    except:
+        return 4227642
+
+# Default for import compatibility
+TOKEN_ID = get_token_id()
 MANAGER_ADDRESS = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1"
 
 # Token Info
@@ -72,11 +81,11 @@ def get_cbbtc_price():
     except:
         return 97000.0
 
-def fetch_data():
-    print(f"Fetching REAL Data for NFT #{TOKEN_ID}...")
+def fetch_data(token_id=TOKEN_ID):
+    print(f"Fetching REAL Data for NFT #{token_id}...")
     
     # 1. Fetch Position Data
-    data_str = ABI_POSITIONS + hex(TOKEN_ID)[2:].zfill(64)
+    data_str = ABI_POSITIONS + hex(token_id)[2:].zfill(64)
     res_pos = call_rpc(MANAGER_ADDRESS, data_str)
     
     if not res_pos or res_pos == "0x":
@@ -216,12 +225,50 @@ def fetch_data():
     
     return output
 
+import argparse
+import os
+
 def main():
-    data = fetch_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--nft-id", type=int, help="Uniswap V3 NFT ID")
+    parser.add_argument("--config", default="tools/config.json", help="Path to config file")
+    args = parser.parse_args()
+    
+    # Resolve NFT ID: Argument > Config File > Default
+    if args.nft_id:
+        nft_id = args.nft_id
+    else:
+        # We need to use the config path passed in args, or default
+        nft_id = get_token_id(args.config)
+    
+    # Create data directory if not exists (for non-default pools)
+    # If using default tools/config.json, we keep behavior of saving to tools/position_data.json
+    # BUT we also want to start populating data/pools/{id}/position_data.json for the future switch
+    
+    base_dir = f"data/pools/{nft_id}"
+    os.makedirs(base_dir, exist_ok=True)
+    
+    data = fetch_data(nft_id)
     if data:
-        with open("tools/position_data.json", "w") as f:
+        # 1. Save to new structure (Always)
+        outfile = f"{base_dir}/position_data.json"
+        with open(outfile, "w") as f:
             json.dump(data, f, indent=2)
-        print("\nSaved to tools/position_data.json")
+            
+        # 2. Save to legacy location (Only if using default config/id, to keep app.py working)
+        # We check if the config being used is the default one OR if the ID matches the default one
+        try:
+            with open("tools/config.json", "r") as f:
+                default_id = json.load(f).get("nft_id")
+        except:
+            default_id = 4227642
+            
+        if str(nft_id) == str(default_id):
+             with open("tools/position_data.json", "w") as f:
+                json.dump(data, f, indent=2)
+             print(f"\nSaved to {outfile} AND tools/position_data.json (Legacy Support)")
+        else:
+             print(f"\nSaved to {outfile}")
 
 if __name__ == "__main__":
     main()

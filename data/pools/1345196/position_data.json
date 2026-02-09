@@ -1,0 +1,22 @@
+{
+  "token0": "0x3ed6a56a9adec22cf1abfc8fc7100fda77312a10",
+  "token1": "0x4200000000000000000000000000000000000006",
+  "symbol0": "cbBTC",
+  "symbol1": "USDC",
+  "fee": 10000,
+  "liquidity": 0,
+  "tick_lower": -175400,
+  "tick_upper": -169200,
+  "current_tick": -200439,
+  "in_range": false,
+  "amount0": 0.0,
+  "amount1": 0.0,
+  "price_cbbtc": 50643060926.72112,
+  "value_usd": 0.0,
+  "fees_usd": 0.0,
+  "unclaimed_0": 0,
+  "unclaimed_1": 0,
+  "price_lower": 4141373133.086684,
+  "price_upper": 2227897700.102387,
+  "price_current": 50643060926.72112
+}
