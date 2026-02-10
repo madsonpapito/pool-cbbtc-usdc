@@ -59,7 +59,8 @@ def main():
     deposit_date = config.get("deposit_date", "2025-01-01")
     nft_id = config.get("nft_id", 0)
     initial_cbbtc_price = config.get("initial_cbbtc_price", 1)
-    
+    last_deposit_amount = config.get("last_deposit_amount", 0)
+
     # Fees Calculation
     fees_collected_value = (collected_usdc * 1.0) + (collected_cbbtc * price_cbbtc)
     
@@ -89,25 +90,28 @@ def main():
     total_apr = total_return_rate * 365 * 100
     
     # Impermanent Loss (Value vs HODL)
+    # HODL baseline should be adjusted if we had multiple deposits.
+    # For now, simplistic approximation based on total invested.
     hodl_value = calculate_hodl_value(total_invested, initial_cbbtc_price, price_cbbtc)
     
-    # IL is the difference between current pool value (excluding fees) and HODL value
-    # Expressed as a percentage of HODL value
     il_abs = value_usd - hodl_value
     il_percent = (il_abs / hodl_value) * 100 if hodl_value > 0 else 0
     
     # LP vs HODL (Net)
-    # This includes fees
     lp_vs_hodl = (value_usd + total_fees) - hodl_value
     
     price_ratio = price_cbbtc / initial_cbbtc_price if initial_cbbtc_price > 0 else 1
 
-    # Chart Data Preparation (Aggregate by Day) - UPDATED LOGIC
+    # Chart Data Preparation (Aggregate by Day)
     chart_data = {}
     
-    # Initial point (Deposit)
-    # Assumption: At deposit, value = total_invested
-    chart_data[deposit_date] = total_invested
+    # Initial point (Deposit) logic:
+    # If total_invested includes a recent deposit, the initial point in 2025 should be lower.
+    initial_val = total_invested
+    if last_deposit_amount > 0 and total_invested > last_deposit_amount:
+         initial_val = total_invested - last_deposit_amount
+         
+    chart_data[deposit_date] = initial_val
     
     if history:
         for h in history:
@@ -155,7 +159,6 @@ def main():
         .gradient-border {{ background: linear-gradient(135deg, #2ea043, #1f6feb); padding: 1px; border-radius: 13px; }}
         .gradient-border-inner {{ background: #161b22; border-radius: 12px; height: 100%; }}
         
-        /* Tooltip container */
         .tooltip {{ position: relative; display: inline-block; cursor: help; }}
         .tooltip .tooltiptext {{
             visibility: hidden;
@@ -167,7 +170,7 @@ def main():
             padding: 5px;
             position: absolute;
             z-index: 1;
-            bottom: 125%; /* Position above */
+            bottom: 125%; 
             left: 50%;
             margin-left: -70px;
             opacity: 0;
