@@ -290,26 +290,39 @@ else:
     total_apr = roi_pct * (365 / days_active)
 
     # 3. Impermanent Loss (Approximate)
-    # IL = Hold Value - Current Value
-    # Hold Value = Initial Investment * (Current Price / Initial Price of exposure)
+    # IL Formula based on price ratio
+    initial_price = config.get("initial_cbbtc_price", 0)
+    if initial_price > 0:
+        price_ratio = current_cbbtc_price / initial_price
+        sqrt_ratio = math.sqrt(price_ratio)
+        il_pct = (2 * sqrt_ratio / (1 + price_ratio) - 1) * 100
+    else:
+        il_pct = 0
+
+    # HODL Value (Assuming 50/50 split at deposit)
+    # If we had exact initial amounts, we should store them in config.json
+    # For now, derive from total_invested and initial price
+    initial_usdc_est = initial_invested * 0.5
+    initial_btc_est = (initial_invested * 0.5) / initial_price if initial_price > 0 else 0
     
-    # Let's assume 50/50 split initially for simpler calc if exact amounts missing
-    initial_usdc = 29.47 
-    initial_cbbtc = 0.000447
+    hodl_value = initial_usdc_est + (initial_btc_est * current_cbbtc_price)
     
-    hodl_value = initial_usdc + (initial_cbbtc * current_cbbtc_price)
+    # IL Value in USD (Position Value - HODL Value)
     impermanent_loss = total_assets_usd - hodl_value
-    il_pct = (impermanent_loss / hodl_value) * 100 if hodl_value > 0 else 0
 
 
     # ---------------------------
     # CARD GENERATOR
     # ---------------------------
-    def card(title, value, sub=None, positive=None):
+    # ---------------------------
+    # CARD GENERATOR
+    # ---------------------------
+    def card(title, value, sub=None, positive=None, tooltip=None):
         color_class = "positive" if positive is True else "negative" if positive is False else ""
         sub_html = f"<div class='card-sub {color_class}'>{sub}</div>" if sub else ""
+        title_attr = f"title='{tooltip}'" if tooltip else ""
         return f"""
-        <div class="dashboard-card">
+        <div class="dashboard-card" {title_attr}>
             <div class="card-title">{title}</div>
             <div class="card-value">{value}</div>
             {sub_html}
@@ -344,28 +357,70 @@ else:
     in_range = pos.get("in_range", False)
     range_emoji = "🟢" if in_range else "🔴"
     
-    with c1: st.markdown(card("Initial cbBTC Price", f"${config.get('initial_cbbtc_price', 0):,.0f}", "Avg Entry"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Token Balances", f"{pos.get('amount0', 0):.2f} USDC", f"{pos.get('amount1', 0):.5f} cbBTC"), unsafe_allow_html=True)
-    with c3: st.markdown(card("Price Range", f"{min_price:,.0f}", f"Min Price"), unsafe_allow_html=True)
+    # Token Balances Display
+    sym0 = pos.get("symbol0", "USDC")
+    amt0 = pos.get("amount0", 0)
+    sym1 = pos.get("symbol1", "cbBTC")
+    amt1 = pos.get("amount1", 0)
+    
+    if sym0 == "USDC":
+         balance_str = f"{amt0:.2f} USDC\n{amt1:.5f} cbBTC"
+    else:
+         balance_str = f"{amt0:.5f} cbBTC\n{amt1:.2f} USDC"
     
     # Improve Max Price formatting
     max_p_display = f"{max_price:,.0f}" if max_price < 1e9 else "∞"
+    
+    with c1: st.markdown(card("Initial cbBTC Price", f"${config.get('initial_cbbtc_price', 0):,.0f}", "Avg Entry"), unsafe_allow_html=True)
+    with c2: st.markdown(card("Token Balances", balance_str, "In Pool"), unsafe_allow_html=True)
+    with c3: st.markdown(card("Price Range", f"{min_price:,.0f}", f"Min Price"), unsafe_allow_html=True)
     with c4: st.markdown(card(f"{range_emoji} Range Status", max_p_display, "Max Price"), unsafe_allow_html=True)
+
+
+    # ---------------------------
+    # PERFORMANCE SUMMARY
+    # ---------------------------
+    st.markdown("---")
+    st.markdown("### 📊 Performance Summary")
+    
+    # Projections
+    daily_fee = total_fees_earned / max(days_active, 1)
+    weekly_fee = daily_fee * 7
+    monthly_fee = daily_fee * 30
+    yearly_fee = daily_fee * 365
+    
+    # ROI Calcs
+    daily_roi = (daily_fee / initial_invested) * 100 if initial_invested > 0 else 0
+    weekly_roi = (weekly_fee / initial_invested) * 100 if initial_invested > 0 else 0
+    monthly_roi = (monthly_fee / initial_invested) * 100 if initial_invested > 0 else 0
+    yearly_roi = (yearly_fee / initial_invested) * 100 if initial_invested > 0 else 0
+    
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: st.markdown(card("Daily Fee Income", f"${daily_fee:,.2f}", "Est. Daily Fee", tooltip=f"Return: {daily_roi:.4f}% of Invested"), unsafe_allow_html=True)
+    with c2: st.markdown(card("Weekly Fee Income", f"${weekly_fee:,.2f}", "Est. Weekly Fee", tooltip=f"Return: {weekly_roi:.4f}% of Invested"), unsafe_allow_html=True)
+    with c3: st.markdown(card("Monthly Fee", f"${monthly_fee:,.2f}", "Est. Monthly", tooltip=f"Return: {monthly_roi:.2f}% of Invested"), unsafe_allow_html=True)
+    with c4: st.markdown(card("Yearly Fee", f"${yearly_fee:,.2f}", "Est. Yearly", tooltip=f"Return: {yearly_roi:.2f}% of Invested"), unsafe_allow_html=True)
 
 
     # CHART
     st.markdown("---")
     if history:
         df = pd.DataFrame(history)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        # Use 'date' instead of 'timestamp' if 'timestamp' is unreliable/missing
+        if 'date' in df.columns:
+             df['ts_chart'] = pd.to_datetime(df['date'])
+        else:
+             df['ts_chart'] = pd.to_datetime(df['timestamp'])
         
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df['timestamp'], y=df['value_usd'], mode='lines', name='Value', line=dict(color='#238636', width=2)))
+        fig.add_trace(go.Scatter(x=df['ts_chart'], y=df['value_usd'], mode='lines', name='Value', line=dict(color='#238636', width=2)))
         fig.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font=dict(color='#8b949e'),
             margin=dict(l=0, r=0, t=0, b=0),
-            height=300
+            height=300,
+            xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=True, gridcolor='#21262d')
         )
         st.plotly_chart(fig, use_container_width=True)

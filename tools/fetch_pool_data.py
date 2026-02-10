@@ -97,6 +97,11 @@ def fetch_data(token_id=TOKEN_ID):
     
     token0_addr = "0x" + words[2][-40:]
     token1_addr = "0x" + words[3][-40:]
+    print(f"DEBUG: Token0 = {token0_addr}")
+    print(f"DEBUG: Token1 = {token1_addr}")
+    print(f"DEBUG: ADDR_USDC = {ADDR_USDC}")
+    print(f"DEBUG: ADDR_CBBTC = {ADDR_CBBTC}")
+
     fee = int(words[4], 16)
     tick_lower = signed_int24(words[5])
     tick_upper = signed_int24(words[6])
@@ -157,27 +162,51 @@ def fetch_data(token_id=TOKEN_ID):
     print(f"{symbol1}: {amount1:.8f}")
     
     # 5. Get Prices
-    # Calculate price from pool tick (most accurate for LP)
-    # Price of token0 (USDC) in token1 (cbBTC)
-    price_t0_in_t1 = float(Decimal("1.0001") ** Decimal(current_tick))
-    # Adjust for decimals: USDC=6, cbBTC=8
-    price_t0_in_t1 *= 10 ** (DECIMALS_USDC - DECIMALS_CBBTC)
+    # Calculate price of Token0 in terms of Token1
+    price0_in_1 = float(Decimal("1.0001") ** Decimal(current_tick))
+    price0_in_1 *= 10 ** (dec0 - dec1)
     
-    price_cbbtc = 0
-    if price_t0_in_t1 != 0:
-        price_cbbtc = 1 / price_t0_in_t1
+    if symbol0 == "cbBTC":
+        # Token0 is cbBTC, Token1 is USDC.
+        # price0_in_1 is price of cbBTC in USDC (i.e. the Price)
+        price_cbbtc = price0_in_1
         
+        # In this case, 1/price is USDC in cbBTC
+        price_lower = float(Decimal("1.0001") ** Decimal(tick_lower)) * (10 ** (dec0 - dec1))
+        price_upper = float(Decimal("1.0001") ** Decimal(tick_upper)) * (10 ** (dec0 - dec1))
+        price_current = price_cbbtc
+        
+    else: # symbol0 == "USDC"
+        # Token0 is USDC, Token1 is cbBTC.
+        # price0_in_1 is price of USDC in cbBTC (e.g. 0.00001)
+        # We want cbBTC price in USDC, so invert
+        price_cbbtc = 0
+        if price0_in_1 != 0:
+            price_cbbtc = 1 / price0_in_1
+            
+        def tick_to_price_cbbtc_usdc(tick):
+            p = float(Decimal("1.0001") ** Decimal(tick))
+            p *= 10 ** (dec0 - dec1)
+            return 1 / p if p != 0 else 0
+
+        price_lower = tick_to_price_cbbtc_usdc(tick_lower)
+        price_upper = tick_to_price_cbbtc_usdc(tick_upper)
+        price_current = price_cbbtc
+
     print(f"cbBTC Price (Pool): ${price_cbbtc:,.2f}")
     
-    # Calculate USD
+    # Calculate USD Value
+    # value = amount0 * price0 + amount1 * price1
     if symbol0 == "USDC":
         value_usd = amount0 * 1.0 + amount1 * price_cbbtc
     else:
+        # symbol0 is cbBTC
         value_usd = amount0 * price_cbbtc + amount1 * 1.0
     
-    # Fees
+    # Fees Value
     fees0 = tokens_owed0 / (10 ** dec0)
     fees1 = tokens_owed1 / (10 ** dec1)
+    
     if symbol0 == "USDC":
         fees_usd = fees0 * 1.0 + fees1 * price_cbbtc
     else:
@@ -187,22 +216,9 @@ def fetch_data(token_id=TOKEN_ID):
     print(f"Position Value: ${value_usd:,.2f}")
     print(f"Unclaimed Fees: ${fees_usd:,.2f}")
     
-    # Convert ticks to prices (cbBTC/USDC)
-    # For USDC(token0)/cbBTC(token1) pair, price = 1.0001^tick * 10^(dec0-dec1)
-    # This gives price of token0 in token1, we want cbBTC/USDC so we invert
-    def tick_to_price_cbbtc_usdc(tick):
-        # Price of token0 (USDC) in token1 (cbBTC)
-        price_t0_in_t1 = float(Decimal("1.0001") ** Decimal(tick))
-        # Adjust for decimals: USDC=6, cbBTC=8
-        price_t0_in_t1 *= 10 ** (DECIMALS_USDC - DECIMALS_CBBTC)
-        # Invert to get cbBTC/USDC
-        if price_t0_in_t1 != 0:
-            return 1 / price_t0_in_t1
-        return 0
-    
-    price_lower = tick_to_price_cbbtc_usdc(tick_lower)
-    price_upper = tick_to_price_cbbtc_usdc(tick_upper)
-    price_current = tick_to_price_cbbtc_usdc(current_tick)
+    # Range Display (Always ensure Lower < Upper for display)
+    if price_lower > price_upper:
+        price_lower, price_upper = price_upper, price_lower
     
     print(f"Price Range: {price_lower:,.2f} - {price_upper:,.2f} cbBTC/USDC")
     print(f"Current Price: {price_current:,.2f} cbBTC/USDC")

@@ -122,11 +122,23 @@ def fetch_fees(nft_id, previous_data_path=OUTPUT_FILE):
             amt1 = int(data_hex[128:192], 16)
             
             # Add to totals
-            # USDC = 6 decimals, cbBTC = 8 decimals
-            total_usdc += amt0 / 1e6
-            total_cbbtc += amt1 / 1e8
+            # We need to know which amt is USDC and which is cbBTC.
+            # Pool #4227642: Token0=USDC, Token1=cbBTC
+            # Pool #1345196: Token0=cbBTC, Token1=USDC
             
-    print(f"\nTotal Collected (Cumulative): {total_usdc:.4f} USDC + {total_cbbtc:.8f} cbBTC")
+            if str(nft_id) == "1345196":
+                # Token0 is cbBTC (8 decimals), Token1 is USDC (6 decimals)
+                amount_cbbtc = amt0 / 1e8
+                amount_usdc = amt1 / 1e6
+            else:
+                # Default (Old Pool): Token0 is USDC (6), Token1 is cbBTC (8)
+                amount_usdc = amt0 / 1e6
+                amount_cbbtc = amt1 / 1e8
+            
+            total_usdc += amount_usdc
+            total_cbbtc += amount_cbbtc
+            
+    print(f"Total Collected (Cumulative): {total_usdc:.4f} USDC + {total_cbbtc:.8f} cbBTC")
     
     result = {
         "nft_id": nft_id,
