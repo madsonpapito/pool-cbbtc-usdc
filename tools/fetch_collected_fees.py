@@ -30,10 +30,10 @@ def get_logs(from_block, to_block):
     try:
         res = requests.post(RPC_URL, json=payload, timeout=30)
         data = res.json()
-        if 'result' in data:
+        if 'result' in data and isinstance(data['result'], list):
             return data['result']
-    except:
-        pass
+    except Exception as e:
+        print(f"get_logs error: {e}")
     return []
 
 def get_block_number():

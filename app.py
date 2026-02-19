@@ -170,7 +170,11 @@ def load_data():
 def sync_data():
     with st.spinner("Syncing data from blockchain..."):
         pos_data = fetch_data()
-        fees_data = fetch_fees()
+        try:
+            fees_data = fetch_fees()
+        except Exception as e:
+            st.warning(f"Could not fetch fees: {e}")
+            fees_data = None
         if pos_data:
             # Save latest data
             with open("tools/position_data.json", "w") as f:
