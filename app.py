@@ -3,7 +3,6 @@ import pandas as pd
 import json
 import datetime
 import math
-import os
 import plotly.graph_objects as go
 from tools.fetch_pool_data import fetch_data
 from tools.fetch_collected_fees import fetch_fees
@@ -13,7 +12,7 @@ st.set_page_config(
     page_title="Liquidity Pool Tracker | USDC/cbBTC",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Custom CSS for Premium Dark Theme
@@ -49,378 +48,423 @@ st.markdown("""
     .card-title {
         color: #8b949e;
         font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-bottom: 0.5rem;
     }
     
     .card-value {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #e6edf3;
+        color: #ffffff;
+        font-size: 1.6rem;
+        font-weight: 700;
+        font-family: 'SF Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
     }
-    
+
     .card-sub {
         font-size: 0.8rem;
-        color: #8b949e;
-        margin-top: 0.5rem;
+        margin-top: 0.2rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .text-green { color: #2ea043 !important; }
+    .text-red { color: #da3633 !important; }
+    .text-gray { color: #8b949e !important; }
+    .text-blue { color: #58a6ff !important; }
+    
+    .bg-badge {
+        background-color: rgba(56, 139, 253, 0.15);
+        color: #58a6ff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        border: 1px solid rgba(56, 139, 253, 0.4);
     }
     
-    .positive { color: #3fb950; }
-    .negative { color: #f85149; }
-    
+    /* Tooltip container */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted #8b949e; 
+        cursor: help;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #1f2428;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border: 1px solid #30363d;
+        font-size: 0.75rem;
+        font-weight: normal;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* Button Styling */
+    .stButton button {
+        background-color: #238636;
+        color: white;
+        border: 1px solid rgba(240, 246, 252, 0.1);
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+    }
+    .stButton button:hover {
+        background-color: #2ea043;
+        border-color: rgba(240, 246, 252, 0.1);
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# AUTO-RELOAD LOGIC (REMOVED - Not needed for stable version)
-# ---------------------------------------------------------
+# Helper Functions
+def calculate_impermanent_loss(current_price, entry_price):
+    if entry_price <= 0: return 0
+    price_ratio = current_price / entry_price
+    if price_ratio <= 0: return 0
+    sqrt_ratio = math.sqrt(price_ratio)
+    # IL = (2 * sqrt(P) / (1 + P)) - 1
+    il = (2 * sqrt_ratio / (1 + price_ratio)) - 1
+    return il * 100
 
-# ---------------------------------------------------------
-# MULTI-POOL LOGIC & SIDEBAR
-# ---------------------------------------------------------
+def calculate_fee_apr(total_fees, position_value, days_active):
+    if position_value <= 0 or days_active <= 0: return 0
+    daily_rate = (total_fees / position_value) / days_active
+    apr = daily_rate * 365 * 100
+    return apr
 
-def load_pools_registry():
+@st.cache_data(ttl=600)
+def load_data():
     try:
-        with open("tools/pools.json", "r") as f:
-            return json.load(f)
-    except:
-        # Fallback if registry missing
-        return [{"nft_id": 4227642, "symbol": "USDC/cbBTC (Main)"}]
-
-def get_pool_paths(nft_id):
-    """Return paths for the specific pool ID"""
-    base_dir = f"data/pools/{nft_id}"
-    os.makedirs(base_dir, exist_ok=True)
-    return {
-        "config": f"{base_dir}/config.json",
-        "position": f"{base_dir}/position_data.json",
-        "fees": f"{base_dir}/fees_data.json",
-        "history": f"{base_dir}/history.json"
-    }
-
-# SIDEBAR
-st.sidebar.title("🥝 Liquidity Manager")
-
-pools = load_pools_registry()
-pool_options = {p['nft_id']: f"{p['symbol']} (#{p['nft_id']})" for p in pools}
-
-# Session State for Selection
-if 'selected_pool_id' not in st.session_state:
-    st.session_state.selected_pool_id = pools[0]['nft_id']
-
-selected_id = st.sidebar.selectbox(
-    "Select Pool",
-    options=list(pool_options.keys()),
-    format_func=lambda x: pool_options[x],
-    index=0
-)
-
-# Update session state if changed
-if selected_id != st.session_state.selected_pool_id:
-    st.session_state.selected_pool_id = selected_id
-    # Force reload of data
-    st.cache_data.clear()
-    st.rerun()
-
-current_nft_id = st.session_state.selected_pool_id
-paths = get_pool_paths(current_nft_id)
-
-st.sidebar.markdown("---")
-st.sidebar.info(f"Viewing Data for Pool #{current_nft_id}")
-
-# ---------------------------------------------------------
-# DATA LOADING (Dynamic)
-# ---------------------------------------------------------
-
-@st.cache_data(ttl=60)
-def load_data(pool_id):
-    p = get_pool_paths(pool_id)
+        with open("tools/config.json", "r") as f: config = json.load(f)
+    except: config = {}
     
-    # Load Config
     try:
-        with open(p['config'], "r") as f: config = json.load(f)
-    except: 
-        # Attempt to load from tools/config.json if it matches ID (Migration fallback)
-        try:
-             with open("tools/config.json", "r") as f: 
-                 base_conf = json.load(f)
-                 if str(base_conf.get('nft_id')) == str(pool_id):
-                     config = base_conf
-                 else:
-                     raise Exception
-        except:
-            config = {"nft_id": pool_id, "total_invested_usd": 0}
+        with open("tools/history.json", "r") as f: history = json.load(f)
+    except: history = []
 
-    # Load History
     try:
-        with open(p['history'], "r") as f: history = json.load(f)
-    except: 
-        try:
-             with open("tools/history.json", "r") as f: history = json.load(f) if str(config.get('nft_id')) == str(pool_id) else []
-        except: history = []
-
-    # Load Position
-    try:
-        with open(p['position'], "r") as f: pos = json.load(f)
-    except: 
-        try:
-             with open("tools/position_data.json", "r") as f: pos = json.load(f)
-        except: pos = {}
-
-    # Load Fees
-    try:
-        with open(p['fees'], "r") as f: fees = json.load(f)
-    except: 
-        try:
-             with open("tools/fees_data.json", "r") as f: fees = json.load(f)
-        except: fees = {}
+        with open("tools/position_data.json", "r") as f: pos = json.load(f)
+        with open("tools/fees_data.json", "r") as f: fees = json.load(f)
+    except:
+        pos = {}
+        fees = {}
         
     return config, history, pos, fees
 
-def sync_data(pool_id):
-    p = get_pool_paths(pool_id)
-    with st.spinner(f"Syncing Pool #{pool_id}..."):
-        # Fetch NEW data
-        pos_data = fetch_data(pool_id)
-        fees_data_result = fetch_fees(pool_id, previous_data_path=p['fees'])
-        
+def sync_data():
+    with st.spinner("Syncing data from blockchain..."):
+        pos_data = fetch_data()
+        try:
+            fees_data = fetch_fees()
+        except Exception as e:
+            st.warning(f"Could not fetch fees: {e}")
+            fees_data = None
         if pos_data:
-            with open(p['position'], "w") as f:
+            # Save latest data
+            with open("tools/position_data.json", "w") as f:
                 json.dump(pos_data, f, indent=2)
             
-            # Also update legacy tool/position_data.json if this is the DEFAULT pool
-            # This keeps other scripts working if they look there
-            if str(pool_id) == "4227642":
-                with open("tools/position_data.json", "w") as f: json.dump(pos_data, f, indent=2)
+            if fees_data:
+                with open("tools/fees_data.json", "w") as f:
+                    json.dump(fees_data, f, indent=2)
 
-        if fees_data_result:
-            with open(p['fees'], "w") as f:
-                json.dump(fees_data_result, f, indent=2)
-                
-            if str(pool_id) == "4227642":
-                with open("tools/fees_data.json", "w") as f: json.dump(fees_data_result, f, indent=2)
+            try:
+                with open("tools/history.json", "r") as f: history = json.load(f)
+            except: history = []
+            
+            # Use safe defaults if keys missing
+            val_usd = pos_data.get('value_usd', 0)
+            fees_usd = pos_data.get('fees_usd', 0)
+            price_c = pos_data.get('price_cbbtc', 0)
 
-
-        # History Snapshot
-        try:
-            with open(p['history'], "r") as f: history = json.load(f)
-        except: history = []
-        
-        # Add snapshot logic here if needed (omitted for brevity, utilizing existing logic)
-        # For now, we assume history is appended elsewhere or we replicate the logic:
-        if pos_data:
             snapshot = {
-                "timestamp": datetime.datetime.now().isoformat(),
-                "value_usd": pos_data.get("value_usd", 0),
-                "price_cbbtc": pos_data.get("price_cbbtc", 0)
+                "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "value_usd": val_usd,
+                "fees_usd": fees_usd,
+                "price_cbbtc": price_c
             }
             history.append(snapshot)
-            # Limit history
-            if len(history) > 500: history = history[-500:]
+            with open("tools/history.json", "w") as f: json.dump(history, f, indent=2)
             
-            with open(p['history'], "w") as f: json.dump(history, f, indent=2)
-            if str(pool_id) == "4227642":
-                with open("tools/history.json", "w") as f: json.dump(history, f, indent=2)
-                
-    st.cache_data.clear()
-    st.rerun()
+            st.cache_data.clear()
+            st.rerun()
 
-
-# Load Data
-config, history, pos, fees_data = load_data(current_nft_id)
-
-
-# ---------------------------
-# DASHBOARD LAYOUT
-# ---------------------------
-
-# Header
-col_header_1, col_header_2 = st.columns([3, 1])
-
-with col_header_1:
-    st.title("🥝 Liquidity Manager v2.1")
-    # Dynamic Title
-    pool_info = next((p for p in pools if p['nft_id'] == current_nft_id), None)
-    symbol = pool_info['symbol'] if pool_info else "Unknown"
-    st.markdown(f"**Pool:** {symbol} | **NFT ID:** #{current_nft_id}")
+# --- Custom Card Component ---
+def metric_card(title, value, sub_value=None, sub_color="green", tooltip=None):
+    sub_html = ""
+    if sub_value:
+        color_class = f"text-{sub_color}"
+        sub_html = f'<div class="card-sub {color_class}">{sub_value}</div>'
     
-with col_header_2:
-    if st.button("🔄 Sync Data", use_container_width=True):
-        sync_data(current_nft_id)
+    # HTML tooltip if provided
+    tooltip_html = ""
+    if tooltip:
+        tooltip_html = f"""<div class="tooltip">ℹ️<span class="tooltiptext">{tooltip}</span></div>"""
+        
+    st.markdown(f"""
+<div class="dashboard-card">
+<div style="display: flex; justify-content: space-between; align-items: start;">
+<div class="card-title">{title}</div>
+{tooltip_html}
+</div>
+<div class="card-value">{value}</div>
+{sub_html}
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("---")
+# Main App
+def main():
+    config, history, pos, fees_data = load_data()
+    
+    if not pos:
+        st.warning("No data found. Click 'Sync Data'.")
+        if st.button("Sync Data"): sync_data()
+        return
 
-if not pos:
-    st.info("No data available. Please click Sync Data.")
-else:
-    # ---------------------------
-    # METRIC CALCULATIONS
-    # ---------------------------
+    # --- Data Extraction ---
+    symbol0, symbol1 = pos.get('symbol0', 'USDC'), pos.get('symbol1', 'cbBTC')
+    amount0, amount1 = pos.get('amount0', 0), pos.get('amount1', 0)
+    value_usd = pos.get('value_usd', 0)
+    price_cbbtc = pos.get('price_cbbtc', 0)
+    price_lower, price_upper = pos.get('price_lower', 0), pos.get('price_upper', 0)
+    in_range = pos.get('in_range', False)
+    liquidity = pos.get('liquidity', 0)
     
-    # 1. Invested & PnL
-    total_assets_usd = pos.get("value_usd", 0)
-    initial_invested = config.get("total_invested_usd", 318.65)
+    unclaimed_0 = pos.get('unclaimed_0', 0) / 1e6
+    unclaimed_1 = pos.get('unclaimed_1', 0) / 1e8
     
-    # Fees Collected (USDC + cbBTC value)
-    collected_usdc = fees_data.get("total_collected_usdc", 0)
-    collected_cbbtc = fees_data.get("total_collected_cbbtc", 0)
-    current_cbbtc_price = pos.get("price_cbbtc", 0)
+    collected_usdc = fees_data.get('total_collected_usdc', 0)
+    collected_cbbtc = fees_data.get('total_collected_cbbtc', 0)
     
-    fees_collected_value = collected_usdc + (collected_cbbtc * current_cbbtc_price)
+    fees_collected_value = (collected_usdc * 1.0) + (collected_cbbtc * price_cbbtc)
+    fees_pending_value = (unclaimed_0 * 1.0) + (unclaimed_1 * price_cbbtc)
+    total_fees = fees_pending_value + fees_collected_value
     
-    unclaimed_fees_usd = pos.get("fees_usd", 0)
-    total_fees_earned = fees_collected_value + unclaimed_fees_usd
-    
-    total_pnl = (total_assets_usd + fees_collected_value) - initial_invested
-    roi_pct = (total_pnl / initial_invested) * 100 if initial_invested > 0 else 0
-    
-    # 2. APR Calculation
-    # Days since deposit
+    total_invested = config.get("total_invested_usd", 118.65)
+    initial_price = config.get("initial_cbbtc_price", 88685)
     deposit_date_str = config.get("deposit_date", "2025-11-24")
+    # FIX: Default to None to ensure fallback to string date if key missing
+    deposit_ts = config.get("deposit_timestamp", None) 
+    
+    # Precise days active
     try:
-        deposit_date = datetime.datetime.strptime(deposit_date_str, "%Y-%m-%d")
+        if deposit_ts:
+            start_dt = datetime.datetime.fromtimestamp(deposit_ts)
+        else:
+            # Parse string date
+            start_dt = datetime.datetime.strptime(deposit_date_str, "%Y-%m-%d")
+        
+        diff = datetime.datetime.now() - start_dt
+        days_active = diff.total_seconds() / 86400
     except:
-        deposit_date = datetime.datetime.now() # Fallback
-
-    days_active = (datetime.datetime.now() - deposit_date).days
-    if days_active < 1: days_active = 1
+        days_active = 1
     
-    fee_apr = (total_fees_earned / initial_invested) * (365 / days_active) * 100 if initial_invested > 0 else 0
+    net_pnl = value_usd - total_invested + total_fees
+    roi_percent = (net_pnl / total_invested) * 100 if total_invested > 0 else 0
     
-    # Total APR (incl IL/Price action) => Just annualized ROI
-    total_apr = roi_pct * (365 / days_active)
-
-    # 3. Impermanent Loss (Approximate)
-    # IL Formula based on price ratio
-    initial_price = config.get("initial_cbbtc_price", 0)
-    if initial_price > 0:
-        price_ratio = current_cbbtc_price / initial_price
-        sqrt_ratio = math.sqrt(price_ratio)
-        il_pct = (2 * sqrt_ratio / (1 + price_ratio) - 1) * 100
-    else:
-        il_pct = 0
-
-    # HODL Value (Assuming 50/50 split at deposit)
-    # If we had exact initial amounts, we should store them in config.json
-    # For now, derive from total_invested and initial price
-    initial_usdc_est = initial_invested * 0.5
-    initial_btc_est = (initial_invested * 0.5) / initial_price if initial_price > 0 else 0
+    fee_apr = calculate_fee_apr(total_fees, total_invested, days_active)
+    total_apr = (roi_percent / days_active) * 365 if days_active > 0 else 0
     
-    hodl_value = initial_usdc_est + (initial_btc_est * current_cbbtc_price)
+    # IL and HODL
+    initial_btc = (total_invested * 0.5) / initial_price
+    initial_usdc = total_invested * 0.5
+    hodl_value = (initial_btc * price_cbbtc) + initial_usdc
     
-    # IL Value in USD (Position Value - HODL Value)
-    impermanent_loss = total_assets_usd - hodl_value
-
-
-    # ---------------------------
-    # CARD GENERATOR
-    # ---------------------------
-    # ---------------------------
-    # CARD GENERATOR
-    # ---------------------------
-    def card(title, value, sub=None, positive=None, tooltip=None):
-        color_class = "positive" if positive is True else "negative" if positive is False else ""
-        sub_html = f"<div class='card-sub {color_class}'>{sub}</div>" if sub else ""
-        title_attr = f"title='{tooltip}'" if tooltip else ""
-        return f"""
-        <div class="dashboard-card" {title_attr}>
-            <div class="card-title">{title}</div>
-            <div class="card-value">{value}</div>
-            {sub_html}
-        </div>
-        """
-
-    # ROW 1: MAIN STATS
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(card("Pooled Assets", f"${total_assets_usd:,.2f}", f"{days_active:.1f} Days Active"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Total PnL", f"${total_pnl:,.2f}", f"{roi_pct:+.2f}% ROI", positive=roi_pct>0), unsafe_allow_html=True)
-    with c3: st.markdown(card("Fee APR (Fee Only)", f"{fee_apr:.2f}%", "Lifetime Avg", positive=True), unsafe_allow_html=True)
-    with c4: st.markdown(card("Total APR (Incl. Price)", f"{total_apr:.2f}%", "ROI Annualized", positive=total_apr>0), unsafe_allow_html=True)
-
-    # ROW 2: STRATEGY PERFORMANCE
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(card("ROI", f"{roi_pct:+.2f}%", f"${total_pnl:,.2f}"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Impermanent Loss", f"{il_pct:.2f}%", f"${impermanent_loss:.2f} USD", positive=False), unsafe_allow_html=True)
-    with c3: st.markdown(card("Total Fees Earned", f"${total_fees_earned:,.2f}", "Collected + Pending", positive=True), unsafe_allow_html=True)
-    with c4: st.markdown(card("LP vs HODL", f"${impermanent_loss + fees_collected_value:,.2f}", "Advantage", positive=(impermanent_loss + fees_collected_value)>0), unsafe_allow_html=True)
-
-    # ROW 3: PRICE DETAILS
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(card("cbBTC Price", f"${current_cbbtc_price:,.0f}", "Current Market"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Initial Investment", f"${initial_invested:,.2f}", "Principal"), unsafe_allow_html=True)
-    with c3: st.markdown(card("Position Age", f"{days_active:.1f} Days", f"Since {deposit_date_str}"), unsafe_allow_html=True)
-    with c4: st.markdown(card("Deposit Date", f"{deposit_date_str}", "Start Date"), unsafe_allow_html=True)
+    # Divergence Loss (Value vs HODL excluding fees)
+    divergence_loss = value_usd - hodl_value
+    il_percent = (divergence_loss / hodl_value) * 100 if hodl_value > 0 else 0
     
-    # ROW 4: RANGE & INFO
-    c1, c2, c3, c4 = st.columns(4)
-    min_price = pos.get("price_lower", 0)
-    max_price = pos.get("price_upper", 0)
-    in_range = pos.get("in_range", False)
-    range_emoji = "🟢" if in_range else "🔴"
-    
-    # Token Balances Display
-    sym0 = pos.get("symbol0", "USDC")
-    amt0 = pos.get("amount0", 0)
-    sym1 = pos.get("symbol1", "cbBTC")
-    amt1 = pos.get("amount1", 0)
-    
-    if sym0 == "USDC":
-         balance_str = f"{amt0:.2f} USDC\n{amt1:.5f} cbBTC"
-    else:
-         balance_str = f"{amt0:.5f} cbBTC\n{amt1:.2f} USDC"
-    
-    # Improve Max Price formatting
-    max_p_display = f"{max_price:,.0f}" if max_price < 1e9 else "∞"
-    
-    with c1: st.markdown(card("Initial cbBTC Price", f"${config.get('initial_cbbtc_price', 0):,.0f}", "Avg Entry"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Token Balances", balance_str, "In Pool"), unsafe_allow_html=True)
-    with c3: st.markdown(card("Price Range", f"{min_price:,.0f}", f"Min Price"), unsafe_allow_html=True)
-    with c4: st.markdown(card(f"{range_emoji} Range Status", max_p_display, "Max Price"), unsafe_allow_html=True)
+    # LP vs HODL (Total Advantage)
+    lp_vs_hodl = (value_usd + total_fees) - hodl_value
 
+    # --- Header Section ---
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        st.markdown(f"""
+<div style="display: flex; align-items: center; gap: 10px;">
+<div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #2775ca, #8c4eee);"></div>
+<h1 style="margin: 0; font-size: 1.5rem;">{symbol0} / <span style="color: #2ea043;">{symbol1}</span></h1>
+<span class="bg-badge">Uniswap V3</span>
+</div>
+<p style="color: #8b949e; margin-top: 5px; font-size: 0.9rem;">Targeting {price_upper:,.0f} - {price_lower:,.0f} {symbol0}/{symbol1}</p>
+""", unsafe_allow_html=True)
+    with c2:
+        status_color = "#2ea043" if in_range else "#da3633"
+        status_text = "IN RANGE" if in_range else "OUT OF RANGE"
+        st.markdown(f"""
+<div style="text-align: right; margin-bottom: 10px;">
+<span style="color: {status_color}; font-weight: bold; font-family: monospace; border: 1px solid {status_color}; padding: 4px 8px; border-radius: 4px;">● {status_text}</span>
+</div>
+""", unsafe_allow_html=True)
+        if st.button("🔄 Sync Data", use_container_width=True):
+            sync_data()
 
-    # ---------------------------
-    # PERFORMANCE SUMMARY
-    # ---------------------------
     st.markdown("---")
-    st.markdown("### 📊 Performance Summary")
-    
-    # Projections
-    daily_fee = total_fees_earned / max(days_active, 1)
-    weekly_fee = daily_fee * 7
-    monthly_fee = daily_fee * 30
-    yearly_fee = daily_fee * 365
-    
-    # ROI Calcs
-    daily_roi = (daily_fee / initial_invested) * 100 if initial_invested > 0 else 0
-    weekly_roi = (weekly_fee / initial_invested) * 100 if initial_invested > 0 else 0
-    monthly_roi = (monthly_fee / initial_invested) * 100 if initial_invested > 0 else 0
-    yearly_roi = (yearly_fee / initial_invested) * 100 if initial_invested > 0 else 0
-    
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(card("Daily Fee Income", f"${daily_fee:,.2f}", "Est. Daily Fee", tooltip=f"Return: {daily_roi:.4f}% of Invested"), unsafe_allow_html=True)
-    with c2: st.markdown(card("Weekly Fee Income", f"${weekly_fee:,.2f}", "Est. Weekly Fee", tooltip=f"Return: {weekly_roi:.4f}% of Invested"), unsafe_allow_html=True)
-    with c3: st.markdown(card("Monthly Fee", f"${monthly_fee:,.2f}", "Est. Monthly", tooltip=f"Return: {monthly_roi:.2f}% of Invested"), unsafe_allow_html=True)
-    with c4: st.markdown(card("Yearly Fee", f"${yearly_fee:,.2f}", "Est. Yearly", tooltip=f"Return: {yearly_roi:.2f}% of Invested"), unsafe_allow_html=True)
 
+    # =========================================================================
+    # ROW 1: Key Metrics
+    # Pooled Assets, Total PnL, Fee APR, Total APR
+    # =========================================================================
+    r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+    with r1c1:
+        metric_card("Pooled Assets", f"${value_usd:,.2f}", f"{days_active:.1f} Days Active", "gray")
+    with r1c2:
+        pnl_color = "green" if net_pnl >= 0 else "red"
+        metric_card("Total PnL", f"${net_pnl:,.2f}", f"{roi_percent:+.2f}% ROI", pnl_color)
+    with r1c3:
+        metric_card("Fee APR (Fee Only)", f"{fee_apr:.2f}%", "Lifetime Avg", "blue")
+    with r1c4:
+        metric_card("Total APR (Incl. Price)", f"{total_apr:.2f}%", f"ROI annualized", "green")
 
-    # CHART
-    st.markdown("---")
+    # =========================================================================
+    # ROW 2: Detailed Performance
+    # ROI, Impermanent Loss, Total Fees Earned, LP vs HODL
+    # =========================================================================
+    r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+    with r2c1:
+        metric_card("ROI", f"{roi_percent:+.2f}%", f"${net_pnl:+.2f}", "green" if roi_percent>=0 else "red")
+    with r2c2:
+        metric_card("Impermanent Loss", f"{il_percent:.2f}%", f"${divergence_loss:.2f} USD", "red")
+    with r2c3:
+        # Tooltip for fees breakdown
+        fees_tooltip = f"Collected: ${fees_collected_value:,.2f} | Pending: ${fees_pending_value:,.2f}"
+        metric_card("Total Fees Earned", f"${total_fees:,.2f}", "Collected + Pending", "green", tooltip=fees_tooltip)
+    with r2c4:
+        color_lphp = "green" if lp_vs_hodl >= 0 else "red"
+        metric_card("LP vs HODL", f"${lp_vs_hodl:+.2f}", "Advantage", color_lphp)
+
+    # =========================================================================
+    # ROW 3: Market & Position Info
+    # cbBTC Price, Initial Investment, Position Age, Deposit Date
+    # =========================================================================
+    r3c1, r3c2, r3c3, r3c4 = st.columns(4)
+    with r3c1:
+        metric_card("cbBTC Price", f"${price_cbbtc:,.0f}", "Current Market", "blue")
+    with r3c2:
+        metric_card("Initial Investment", f"${total_invested:,.2f}", "Principal", "gray")
+    with r3c3:
+        metric_card("Position Age", f"{days_active:.1f} Days", f"Since {deposit_date_str}", "gray")
+    with r3c4:
+        metric_card("Deposit Date", deposit_date_str, "Start Date", "gray")
+
+    # =========================================================================
+    # ROW 4: Extra Details / Tokens
+    # Initial cbBTC Price, Token Balances, Price Range
+    # =========================================================================
+    r4c1, r4c2, r4c3 = st.columns([1, 1, 2])
+    with r4c1:
+        metric_card("Initial cbBTC Price", f"${initial_price:,.0f}", "Avg Entry", "gray")
+    with r4c2:
+        # Token Balances
+        balance_str = f"{amount0:.2f} USDC<br>{amount1:.5f} cbBTC"
+        st.markdown(f"""
+<div class="dashboard-card">
+<div class="card-title">Token Balances</div>
+<div class="card-value" style="font-size: 1.1rem; line-height: 1.5;">{amount0:,.2f} <span style="font-size: 0.8em; color: #8b949e;">USDC</span></div>
+<div class="card-value" style="font-size: 1.1rem; line-height: 1.5;">{amount1:,.5f} <span style="font-size: 0.8em; color: #8b949e;">cbBTC</span></div>
+</div>
+""", unsafe_allow_html=True)
+    with r4c3:
+        # Price Range visual
+        st.markdown(f"""
+<div class="dashboard-card">
+<div class="card-title">Price Range</div>
+<div style="display: flex; justify-content: space-between; margin-top: 10px;">
+<div style="text-align: left;">
+<div style="color: #8b949e; font-size: 0.8rem;">Min Price</div>
+<div style="font-family: monospace; font-size: 1.2rem;">{price_upper:,.0f}</div>
+</div>
+<div style="align-self: center; font-weight: bold; color: #58a6ff;">⟷</div>
+<div style="text-align: right;">
+<div style="color: #8b949e; font-size: 0.8rem;">Max Price</div>
+<div style="font-family: monospace; font-size: 1.2rem;">{price_lower:,.0f}</div>
+</div>
+</div>
+<div style="margin-top: 10px; background: #30363d; height: 6px; border-radius: 3px; position: relative;">
+<!-- Marker for current price could go here if normalized -->
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # =========================================================================
+    # ROW 5: Chart
+    # =========================================================================
+    st.markdown("### Value History")
     if history:
         df = pd.DataFrame(history)
-        # Use 'date' instead of 'timestamp' if 'timestamp' is unreliable/missing
-        if 'date' in df.columns:
-             df['ts_chart'] = pd.to_datetime(df['date'])
-        else:
-             df['ts_chart'] = pd.to_datetime(df['timestamp'])
+        df['date'] = pd.to_datetime(df['date'])
         
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df['ts_chart'], y=df['value_usd'], mode='lines', name='Value', line=dict(color='#238636', width=2)))
+        fig.add_trace(go.Scatter(
+            x=df['date'], y=df['value_usd'],
+            mode='lines',
+            name='Value',
+            line=dict(color='#2ea043', width=2),
+            fill='tozeroy',
+            fillcolor='rgba(46, 160, 67, 0.1)'
+        ))
+        
         fig.update_layout(
+            margin=dict(l=0, r=0, t=20, b=0),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#8b949e'),
-            margin=dict(l=0, r=0, t=0, b=0),
-            height=300,
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='#21262d')
+            height=350,
+            xaxis=dict(showgrid=False, zeroline=False, tickfont=dict(color='#8b949e')),
+            yaxis=dict(showgrid=True, gridcolor='#30363d', zeroline=False, tickfont=dict(color='#8b949e')),
+            hovermode='x unified'
         )
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No history data available.")
+
+    # =========================================================================
+    # ROW 6: Performance Summary (Yield Projections)
+    # =========================================================================
+    avg_daily = total_fees / days_active if days_active > 0 else 0
+    projections = {
+        "Daily": avg_daily,
+        "Weekly": avg_daily * 7,
+        "Monthly": avg_daily * 30,
+        "Yearly": avg_daily * 365
+    }
+
+    st.markdown("### Performance Summary (Projected Yield)")
+    c_proj = st.columns(4)
+    periods = ["Daily", "Weekly", "Monthly", "Yearly"]
+    
+    for i, period in enumerate(periods):
+        val = projections[period]
+        # Calculate percent of total investment
+        pct = (val / total_invested * 100) if total_invested > 0 else 0
+        
+        # Tooltip with %
+        tooltip_txt = f"{pct:.2f}% of Initial Investment"
+        
+        with c_proj[i]:
+            # Custom card for this
+            st.markdown(f"""
+<div class="dashboard-card tooltip" style="text-align: center;">
+<div class="card-title">{period}</div>
+<div style="color: #2ea043; font-size: 1.4rem; font-weight: bold; margin-top: 5px;">${val:,.2f}</div>
+<span class="tooltiptext">{tooltip_txt}</span>
+</div>
+""", unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
