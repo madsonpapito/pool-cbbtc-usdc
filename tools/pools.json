@@ -1,10 +1,20 @@
-[
-    {
-        "nft_id": 4227642,
-        "symbol": "USDC/cbBTC (Main)"
-    },
-    {
-        "nft_id": 1345196,
-        "symbol": "USDC/cbBTC"
-    }
-]
+{
+    "pools": [
+        {
+            "nft_id": 4227642,
+            "label": "USDC/cbBTC 0.05% (Range: 73k-117k)",
+            "version": "v3",
+            "total_invested_usd": 318.65,
+            "deposit_date": "2025-11-24",
+            "initial_cbbtc_price": 88685
+        },
+        {
+            "nft_id": 4660395,
+            "label": "USDC/cbBTC 0.05% (Range: 57k-73k)",
+            "version": "v3",
+            "total_invested_usd": 390.29,
+            "deposit_date": "2026-02-18",
+            "initial_cbbtc_price": 67200
+        }
+    ]
+}

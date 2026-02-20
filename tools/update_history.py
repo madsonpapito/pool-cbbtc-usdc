@@ -2,13 +2,26 @@ import json
 import datetime
 import time
 import os
+import requests
 
 HISTORY_FILE = "tools/history.json"
 DATA_FILE = "tools/position_data.json"
 
-# Mock Prices for MVP (In prod, fetch from Coingecko)
 PRICE_USDC = 1.0
-PRICE_CBBTC = 98000.0 # TODO: Fetch live
+
+def get_cbbtc_price(fallback=68000.0):
+    """Fetch live cbBTC price from CoinGecko API"""
+    try:
+        url = "https://api.coingecko.com/api/v3/simple/price?ids=coinbase-wrapped-btc&vs_currencies=usd"
+        res = requests.get(url, timeout=5)
+        price = res.json().get('coinbase-wrapped-btc', {}).get('usd')
+        if price:
+            print(f"cbBTC price (CoinGecko): ${price:,.2f}")
+            return float(price)
+    except Exception as e:
+        print(f"CoinGecko error: {e}")
+    print(f"Using fallback price: ${fallback:,.2f}")
+    return fallback
 
 def main():
     # 1. Read latest snapshot
@@ -24,14 +37,13 @@ def main():
     snapshot['timestamp'] = int(time.time())
     snapshot['date'] = now.strftime("%Y-%m-%d %H:%M:%S")
     
-    # Calculate Estimated USD Value (Liquidity is complex, approximating via Token Amounts if we had them)
-    # Since fetch_pool_data.py doesn't decode Amount0/Amount1 yet (complex math), 
-    # we will track Raw Liquidity and Unclaimed Fees for now.
-    # Future improvement: Calculate Amount0/Amount1 using SqrtPrice.
+    # Get live cbBTC price (fallback to price from position data)
+    fallback_price = snapshot.get('price_cbbtc', 68000.0)
+    price_cbbtc = get_cbbtc_price(fallback=fallback_price)
     
     snapshot['prices'] = {
         "USDC": PRICE_USDC,
-        "cbBTC": PRICE_CBBTC
+        "cbBTC": price_cbbtc
     }
 
     # 3. Append to History

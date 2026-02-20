@@ -8,29 +8,16 @@
   "liquidity": 48380790,
   "tick_lower": -70660,
   "tick_upper": -65960,
-<<<<<<< Updated upstream
-  "current_tick": -65600,
-  "in_range": false,
-  "amount0": 0.0,
-  "amount1": 0.0037450639080712613,
-  "price_cbbtc": 70604.00909047376,
-  "value_usd": 264.4165262098685,
-=======
   "current_tick": -65182,
   "in_range": false,
   "amount0": 0.0,
   "amount1": 0.0037450639080712613,
   "price_cbbtc": 67713.73358047362,
   "value_usd": 253.59225971298474,
->>>>>>> Stashed changes
   "fees_usd": 0.0,
   "unclaimed_0": 0,
   "unclaimed_1": 0,
   "price_lower": 117103.90651575601,
   "price_upper": 73191.92707253304,
-<<<<<<< Updated upstream
-  "price_current": 70604.00909047376
-=======
   "price_current": 67713.73358047362
->>>>>>> Stashed changes
 }

@@ -1,5 +1,7 @@
 import requests
 import json
+import sys
+import os
 from decimal import Decimal, getcontext
 
 # Set high precision for V3 math
@@ -7,23 +9,13 @@ getcontext().prec = 50
 
 # Configuration
 RPC_URL = "https://mainnet.base.org"
-
-def get_token_id(config_path="tools/config.json"):
-    try:
-        with open(config_path, "r") as f:
-            return json.load(f).get("nft_id", 4227642)
-    except:
-        return 4227642
-
-# Default for import compatibility
-TOKEN_ID = get_token_id()
 MANAGER_ADDRESS = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1"
 
-# Token Info
-ADDR_USDC = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
-ADDR_CBBTC = "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf"
-DECIMALS_USDC = 6
-DECIMALS_CBBTC = 8
+# Token Info (known tokens on Base)
+KNOWN_TOKENS = {
+    "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913": {"symbol": "USDC", "decimals": 6},
+    "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf": {"symbol": "cbBTC", "decimals": 8},
+}
 
 # ABI Signatures
 ABI_POSITIONS = "0x99fbab88"
@@ -81,7 +73,10 @@ def get_cbbtc_price():
     except:
         return 97000.0
 
-def fetch_data(token_id=TOKEN_ID):
+def fetch_data(token_id=None):
+    if token_id is None:
+        token_id = 4227642  # Default for backwards compat
+    
     print(f"Fetching REAL Data for NFT #{token_id}...")
     
     # 1. Fetch Position Data
@@ -97,11 +92,6 @@ def fetch_data(token_id=TOKEN_ID):
     
     token0_addr = "0x" + words[2][-40:]
     token1_addr = "0x" + words[3][-40:]
-    print(f"DEBUG: Token0 = {token0_addr}")
-    print(f"DEBUG: Token1 = {token1_addr}")
-    print(f"DEBUG: ADDR_USDC = {ADDR_USDC}")
-    print(f"DEBUG: ADDR_CBBTC = {ADDR_CBBTC}")
-
     fee = int(words[4], 16)
     tick_lower = signed_int24(words[5])
     tick_upper = signed_int24(words[6])
@@ -109,13 +99,12 @@ def fetch_data(token_id=TOKEN_ID):
     tokens_owed0 = int(words[10], 16)
     tokens_owed1 = int(words[11], 16)
 
-    # Determine token order
-    if token0_addr.lower() == ADDR_USDC.lower():
-        symbol0, symbol1 = "USDC", "cbBTC"
-        dec0, dec1 = DECIMALS_USDC, DECIMALS_CBBTC
-    else:
-        symbol0, symbol1 = "cbBTC", "USDC"
-        dec0, dec1 = DECIMALS_CBBTC, DECIMALS_USDC
+    # Determine token info from known tokens
+    t0_info = KNOWN_TOKENS.get(token0_addr.lower(), {"symbol": "Token0", "decimals": 18})
+    t1_info = KNOWN_TOKENS.get(token1_addr.lower(), {"symbol": "Token1", "decimals": 18})
+    
+    symbol0, dec0 = t0_info["symbol"], t0_info["decimals"]
+    symbol1, dec1 = t1_info["symbol"], t1_info["decimals"]
 
     print(f"Pair: {symbol0}/{symbol1}")
     print(f"Tick Range: [{tick_lower}, {tick_upper}]")
@@ -162,51 +151,24 @@ def fetch_data(token_id=TOKEN_ID):
     print(f"{symbol1}: {amount1:.8f}")
     
     # 5. Get Prices
-    # Calculate price of Token0 in terms of Token1
-    price0_in_1 = float(Decimal("1.0001") ** Decimal(current_tick))
-    price0_in_1 *= 10 ** (dec0 - dec1)
+    price_t0_in_t1 = float(Decimal("1.0001") ** Decimal(current_tick))
+    price_t0_in_t1 *= 10 ** (dec0 - dec1)
     
-    if symbol0 == "cbBTC":
-        # Token0 is cbBTC, Token1 is USDC.
-        # price0_in_1 is price of cbBTC in USDC (i.e. the Price)
-        price_cbbtc = price0_in_1
+    price_cbbtc = 0
+    if price_t0_in_t1 != 0:
+        price_cbbtc = 1 / price_t0_in_t1
         
-        # In this case, 1/price is USDC in cbBTC
-        price_lower = float(Decimal("1.0001") ** Decimal(tick_lower)) * (10 ** (dec0 - dec1))
-        price_upper = float(Decimal("1.0001") ** Decimal(tick_upper)) * (10 ** (dec0 - dec1))
-        price_current = price_cbbtc
-        
-    else: # symbol0 == "USDC"
-        # Token0 is USDC, Token1 is cbBTC.
-        # price0_in_1 is price of USDC in cbBTC (e.g. 0.00001)
-        # We want cbBTC price in USDC, so invert
-        price_cbbtc = 0
-        if price0_in_1 != 0:
-            price_cbbtc = 1 / price0_in_1
-            
-        def tick_to_price_cbbtc_usdc(tick):
-            p = float(Decimal("1.0001") ** Decimal(tick))
-            p *= 10 ** (dec0 - dec1)
-            return 1 / p if p != 0 else 0
-
-        price_lower = tick_to_price_cbbtc_usdc(tick_lower)
-        price_upper = tick_to_price_cbbtc_usdc(tick_upper)
-        price_current = price_cbbtc
-
     print(f"cbBTC Price (Pool): ${price_cbbtc:,.2f}")
     
-    # Calculate USD Value
-    # value = amount0 * price0 + amount1 * price1
+    # Calculate USD
     if symbol0 == "USDC":
         value_usd = amount0 * 1.0 + amount1 * price_cbbtc
     else:
-        # symbol0 is cbBTC
         value_usd = amount0 * price_cbbtc + amount1 * 1.0
     
-    # Fees Value
+    # Fees
     fees0 = tokens_owed0 / (10 ** dec0)
     fees1 = tokens_owed1 / (10 ** dec1)
-    
     if symbol0 == "USDC":
         fees_usd = fees0 * 1.0 + fees1 * price_cbbtc
     else:
@@ -216,15 +178,24 @@ def fetch_data(token_id=TOKEN_ID):
     print(f"Position Value: ${value_usd:,.2f}")
     print(f"Unclaimed Fees: ${fees_usd:,.2f}")
     
-    # Range Display (Always ensure Lower < Upper for display)
-    if price_lower > price_upper:
-        price_lower, price_upper = price_upper, price_lower
+    # Convert ticks to prices (cbBTC/USDC)
+    def tick_to_price_cbbtc_usdc(tick):
+        price_t0_in_t1 = float(Decimal("1.0001") ** Decimal(tick))
+        price_t0_in_t1 *= 10 ** (dec0 - dec1)
+        if price_t0_in_t1 != 0:
+            return 1 / price_t0_in_t1
+        return 0
+    
+    price_lower = tick_to_price_cbbtc_usdc(tick_lower)
+    price_upper = tick_to_price_cbbtc_usdc(tick_upper)
+    price_current = tick_to_price_cbbtc_usdc(current_tick)
     
     print(f"Price Range: {price_lower:,.2f} - {price_upper:,.2f} cbBTC/USDC")
     print(f"Current Price: {price_current:,.2f} cbBTC/USDC")
 
     # Result Dict
     output = {
+        "nft_id": token_id,
         "token0": token0_addr, "token1": token1_addr,
         "symbol0": symbol0, "symbol1": symbol1,
         "fee": fee, "liquidity": liquidity,
@@ -241,50 +212,27 @@ def fetch_data(token_id=TOKEN_ID):
     
     return output
 
-import argparse
-import os
-
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--nft-id", type=int, help="Uniswap V3 NFT ID")
-    parser.add_argument("--config", default="tools/config.json", help="Path to config file")
-    args = parser.parse_args()
-    
-    # Resolve NFT ID: Argument > Config File > Default
-    if args.nft_id:
-        nft_id = args.nft_id
+    # Accept NFT ID from CLI argument
+    if len(sys.argv) > 1:
+        token_id = int(sys.argv[1])
     else:
-        # We need to use the config path passed in args, or default
-        nft_id = get_token_id(args.config)
+        token_id = 4227642  # Default
     
-    # Create data directory if not exists (for non-default pools)
-    # If using default tools/config.json, we keep behavior of saving to tools/position_data.json
-    # BUT we also want to start populating data/pools/{id}/position_data.json for the future switch
+    # Determine output path
+    pool_dir = f"tools/pools/{token_id}"
+    os.makedirs(pool_dir, exist_ok=True)
+    output_file = f"{pool_dir}/position_data.json"
     
-    base_dir = f"data/pools/{nft_id}"
-    os.makedirs(base_dir, exist_ok=True)
-    
-    data = fetch_data(nft_id)
+    data = fetch_data(token_id)
     if data:
-        # 1. Save to new structure (Always)
-        outfile = f"{base_dir}/position_data.json"
-        with open(outfile, "w") as f:
+        with open(output_file, "w") as f:
             json.dump(data, f, indent=2)
-            
-        # 2. Save to legacy location (Only if using default config/id, to keep app.py working)
-        # We check if the config being used is the default one OR if the ID matches the default one
-        try:
-            with open("tools/config.json", "r") as f:
-                default_id = json.load(f).get("nft_id")
-        except:
-            default_id = 4227642
-            
-        if str(nft_id) == str(default_id):
-             with open("tools/position_data.json", "w") as f:
-                json.dump(data, f, indent=2)
-             print(f"\nSaved to {outfile} AND tools/position_data.json (Legacy Support)")
-        else:
-             print(f"\nSaved to {outfile}")
+        print(f"\nSaved to {output_file}")
+        
+        # Also save to legacy path for backwards compat
+        with open("tools/position_data.json", "w") as f:
+            json.dump(data, f, indent=2)
 
 if __name__ == "__main__":
     main()

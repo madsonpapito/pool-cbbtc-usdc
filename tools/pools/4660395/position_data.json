@@ -1,0 +1,23 @@
+{
+  "nft_id": 4660395,
+  "token0": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "token1": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+  "symbol0": "USDC",
+  "symbol1": "cbBTC",
+  "fee": 500,
+  "liquidity": 125502086,
+  "tick_lower": -66010,
+  "tick_upper": -63530,
+  "current_tick": -65197,
+  "in_range": true,
+  "amount0": 261.27269367093106,
+  "amount1": 0.0019208543348067056,
+  "price_cbbtc": 67815.3753110836,
+  "value_usd": 391.53615130376966,
+  "fees_usd": 0.0,
+  "unclaimed_0": 0,
+  "unclaimed_1": 0,
+  "price_lower": 73558.78474525128,
+  "price_upper": 57403.040837249646,
+  "price_current": 67815.3753110836
+}
