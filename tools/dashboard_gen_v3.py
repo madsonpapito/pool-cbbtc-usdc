@@ -545,12 +545,7 @@ def main():
 
         async function syncData() {{
             const btn = document.getElementById('syncBtn');
-            const isVercel = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
             
-            if (isVercel) {{
-                alert('Sync só funciona localmente.\\nPara atualizar no Vercel:\\n1. python tools/sync.py\\n2. git push');
-                return;
-            }}
             
             btn.innerHTML = 'Syncing...';
             btn.disabled = true;
