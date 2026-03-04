@@ -3,11 +3,7 @@ import datetime
 import time
 import os
 import requests
-
-HISTORY_FILE = "tools/history.json"
-DATA_FILE = "tools/position_data.json"
-
-PRICE_USDC = 1.0
+import sys
 
 def get_cbbtc_price(fallback=68000.0):
     """Fetch live cbBTC price from CoinGecko API"""
@@ -24,15 +20,25 @@ def get_cbbtc_price(fallback=68000.0):
     return fallback
 
 def main():
-    # 1. Read latest snapshot
+    # 1. NFT ID from arguments
+    if len(sys.argv) < 2:
+        print("Usage: python tools/update_history.py <nft_id>")
+        return
+    
+    nft_id = sys.argv[1]
+    pool_dir = f"tools/pools/{nft_id}"
+    data_file = f"{pool_dir}/position_data.json"
+    history_file = f"{pool_dir}/history.json"
+
+    # 2. Read latest snapshot
     try:
-        with open(DATA_FILE, "r") as f:
+        with open(data_file, "r") as f:
             snapshot = json.load(f)
     except FileNotFoundError:
-        print(f"Error: {DATA_FILE} not found. Run fetch_pool_data.py first.")
+        print(f"Error: {data_file} not found. Run fetch_pool_data.py {nft_id} first.")
         return
 
-    # 2. Add Metadata (Time, Values)
+    # 3. Add Metadata (Time, Values)
     now = datetime.datetime.now()
     snapshot['timestamp'] = int(time.time())
     snapshot['date'] = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -42,26 +48,31 @@ def main():
     price_cbbtc = get_cbbtc_price(fallback=fallback_price)
     
     snapshot['prices'] = {
-        "USDC": PRICE_USDC,
+        "USDC": 1.0,
         "cbBTC": price_cbbtc
     }
 
-    # 3. Append to History
+    # 4. Append to History
     history = []
-    if os.path.exists(HISTORY_FILE):
+    if os.path.exists(history_file):
         try:
-            with open(HISTORY_FILE, "r") as f:
+            with open(history_file, "r") as f:
                 history = json.load(f)
         except json.JSONDecodeError:
             history = []
 
     history.append(snapshot)
 
-    # 4. Save
-    with open(HISTORY_FILE, "w") as f:
+    # 5. Save
+    with open(history_file, "w") as f:
         json.dump(history, f, indent=2)
     
-    print(f"History updated. Total snapshots: {len(history)}")
+    print(f"History updated for Pool {nft_id}. Total snapshots: {len(history)}")
+
+    # 6. Legacy support (if it's the main pool)
+    if nft_id == "4227642":
+        with open("tools/history.json", "w") as f:
+            json.dump(history, f, indent=2)
 
 if __name__ == "__main__":
     main()

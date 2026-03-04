@@ -3,8 +3,10 @@ import datetime
 import math
 import os
 
-POOLS_FILE = "tools/pools.json"
-OUTPUT_FILE = "index.html"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+POOLS_FILE = os.path.join(PROJECT_ROOT, "tools", "pools.json")
+OUTPUT_FILE = os.path.join(PROJECT_ROOT, "index.html")
 
 def calculate_impermanent_loss(price_ratio):
     if price_ratio <= 0: return 0
@@ -20,10 +22,10 @@ def calculate_fee_apr(total_fees, position_value, days_active):
 
 def load_pool_data(nft_id):
     """Load all data for a single pool"""
-    pool_dir = f"tools/pools/{nft_id}"
+    pool_dir = os.path.join(PROJECT_ROOT, "tools", "pools", str(nft_id))
     
     try:
-        with open(f"{pool_dir}/position_data.json", "r") as f: pos = json.load(f)
+        with open(os.path.join(pool_dir, "position_data.json"), "r") as f: pos = json.load(f)
     except FileNotFoundError:
         print(f"  Warning: No position data for pool {nft_id}")
         return None
@@ -545,8 +547,6 @@ def main():
 
         async function syncData() {{
             const btn = document.getElementById('syncBtn');
-            
-            
             btn.innerHTML = 'Syncing...';
             btn.disabled = true;
             btn.classList.add('opacity-75');
@@ -554,18 +554,51 @@ def main():
             try {{
                 const response = await fetch('/api/sync', {{ method: 'POST' }});
                 const data = await response.json();
+                
                 if (data.success) {{
-                    alert('Sync complete!');
-                    window.location.reload();
+                    // Start polling for completion
+                    let attempts = 0;
+                    const maxAttempts = 60; // 5 minutes (5s interval)
+                    
+                    const poll = setInterval(async () => {{
+                        attempts++;
+                        try {{
+                            const statusResp = await fetch('/api/sync/status');
+                            const statusData = await statusResp.json();
+                            
+                            if (!statusData.running) {{
+                                clearInterval(poll);
+                                if (statusData.last_result && statusData.last_result.success) {{
+                                    alert('Sync complete!');
+                                }} else if (statusData.last_result) {{
+                                    alert('Sync finished with error: ' + statusData.last_result.message);
+                                }} else {{
+                                    alert('Sync finished!');
+                                }}
+                                window.location.reload();
+                            }}
+                            
+                            if (attempts >= maxAttempts) {{
+                                clearInterval(poll);
+                                alert('Sync is taking longer than expected. Please check back in a few minutes.');
+                                window.location.reload();
+                            }}
+                        }} catch (e) {{
+                            console.error('Polling error:', e);
+                        }}
+                    }}, 5000);
                 }} else {{
                     alert('Error: ' + data.message);
+                    btn.innerHTML = 'Sync All Pools';
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75');
                 }}
             }} catch (error) {{
                 alert('Connection failed. Make sure server.py is running.');
+                btn.innerHTML = 'Sync All Pools';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
             }}
-            btn.innerHTML = 'Sync All Pools';
-            btn.disabled = false;
-            btn.classList.remove('opacity-75');
         }}
 
         // Initialize charts

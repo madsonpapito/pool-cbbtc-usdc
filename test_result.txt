@@ -1,0 +1,14 @@
+
+>>> curl -s -X POST http://localhost:3333/api/sync
+{"success": true, "message": "Sync already in progress, please wait..."}
+
+>>> curl -s http://localhost:3333/api/sync/status
+{"running": true, "last_result": null}
+
+>>> systemctl is-active pool-dashboard
+active
+
+>>> ps aux | grep -E '(sync|fetch)' | grep -v grep
+systemd+   14222  0.0  0.3  89364  3532 ?        Ssl   2025   0:08 /lib/systemd/systemd-timesyncd
+root     1780746  0.2  1.0  18120 10176 ?        S    17:54   0:00 /usr/bin/python3 tools/sync.py
+root     1780748  2.7  2.8  35544 27636 ?        S    17:54   0:00 /usr/bin/python3 tools/fetch_collected_fees.py 4227642

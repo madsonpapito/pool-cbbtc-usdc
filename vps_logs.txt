@@ -1,0 +1,122 @@
+=== STATUS ===
+● pool-dashboard.service - Pool Dashboard API
+     Loaded: loaded (/etc/systemd/system/pool-dashboard.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2026-03-04 16:48:19 UTC; 37min ago
+   Main PID: 1778400 (python3)
+      Tasks: 3 (limit: 1102)
+     Memory: 33.3M
+        CPU: 11.988s
+     CGroup: /system.slice/pool-dashboard.service
+             ├─1778400 /usr/bin/python3 /opt/pool-dashboard/tools/server.py
+             ├─1778404 /usr/bin/python3 tools/sync.py
+             └─1778914 /usr/bin/python3 tools/fetch_collected_fees.py 4660395
+
+Mar 04 16:48:19 bunker-hyper500 systemd[1]: Started Pool Dashboard API.
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Serving at port 3333 from /opt/pool-dashboard
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Local dashboard server running at http://localhost:3333
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Press Ctrl+C to stop.
+Mar 04 16:48:22 bunker-hyper500 python3[1778400]: 127.0.0.1 - - [04/Mar/2026 16:48:22] "POST /api/sync HTTP/1.0" 200 -
+Mar 04 16:48:22 bunker-hyper500 python3[1778400]: Received sync request...
+
+
+=== LOGS ===
+Feb 28 23:23:05 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:05] "POST /api/v1/users/avatar HTTP/1.0" 404 -
+Feb 28 23:23:05 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:05] code 404, message Not Found
+Feb 28 23:23:05 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:05] "POST /api/media HTTP/1.0" 404 -
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] code 404, message Not Found
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] "POST /api/media/upload HTTP/1.0" 404 -
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] code 404, message Not Found
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] "POST /api/images HTTP/1.0" 404 -
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] code 404, message Not Found
+Feb 28 23:23:06 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:06] "POST /api/images/upload HTTP/1.0" 404 -
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] code 404, message Not Found
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] "POST /api/photos HTTP/1.0" 404 -
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] code 404, message Not Found
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] "POST /api/gallery/upload HTTP/1.0" 404 -
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] code 404, message Not Found
+Feb 28 23:23:07 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:07] "POST /api/documents HTTP/1.0" 404 -
+Feb 28 23:23:08 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:08] code 404, message Not Found
+Feb 28 23:23:08 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:08] "POST /api/documents/upload HTTP/1.0" 404 -
+Feb 28 23:23:08 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:08] code 404, message Not Found
+Feb 28 23:23:08 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:08] "POST /api/files HTTP/1.0" 404 -
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] code 404, message Not Found
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] "POST /api/attachments HTTP/1.0" 404 -
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] code 404, message Not Found
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] "POST /api/v1/documents HTTP/1.0" 404 -
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] code 404, message Not Found
+Feb 28 23:23:09 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:09] "POST /api/content/upload HTTP/1.0" 404 -
+Feb 28 23:23:10 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:10] code 404, message Not Found
+Feb 28 23:23:10 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:10] "POST /api/assets HTTP/1.0" 404 -
+Feb 28 23:23:10 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:10] code 404, message Not Found
+Feb 28 23:23:10 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:10] "POST /api/assets/upload HTTP/1.0" 404 -
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] code 404, message Not Found
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] "POST /api/products/images HTTP/1.0" 404 -
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] code 404, message Not Found
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] "POST /api/products/upload HTTP/1.0" 404 -
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] code 404, message Not Found
+Feb 28 23:23:12 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:12] "POST /api/catalog/images HTTP/1.0" 404 -
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] code 404, message Not Found
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] "POST /api/resources/upload HTTP/1.0" 404 -
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] code 404, message Not Found
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] "POST /api/storage HTTP/1.0" 404 -
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] code 404, message Not Found
+Feb 28 23:23:13 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:13] "POST /api/storage/upload HTTP/1.0" 404 -
+Feb 28 23:23:14 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:14] code 404, message Not Found
+Feb 28 23:23:14 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:14] "POST /api/blob HTTP/1.0" 404 -
+Feb 28 23:23:14 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:14] code 404, message Not Found
+Feb 28 23:23:14 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:14] "POST /api/blob/upload HTTP/1.0" 404 -
+Feb 28 23:23:17 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:17] code 404, message Not Found
+Feb 28 23:23:17 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:17] "POST /api/import HTTP/1.0" 404 -
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] code 404, message Not Found
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] "POST /api/v2/files HTTP/1.0" 404 -
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] code 404, message Not Found
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] "POST /api/multipart HTTP/1.0" 404 -
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] code 404, message Not Found
+Feb 28 23:23:18 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:18] "POST /api/bulk-upload HTTP/1.0" 404 -
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] code 404, message Not Found
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] "POST /api/batch/upload HTTP/1.0" 404 -
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] code 404, message Not Found
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] "POST /api/drive/upload HTTP/1.0" 404 -
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] code 404, message Not Found
+Feb 28 23:23:19 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:19] "POST /api/s3/upload HTTP/1.0" 404 -
+Feb 28 23:23:20 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:20] code 404, message Not Found
+Feb 28 23:23:20 bunker-hyper500 python3[1461685]: 127.0.0.1 - - [28/Feb/2026 23:23:20] "POST /api/storage/local HTTP/1.0" 404 -
+Feb 28 23:38:00 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:00] "GET / HTTP/1.1" 200 -
+Feb 28 23:38:01 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:01] code 404, message Not Found
+Feb 28 23:38:01 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:01] "POST / HTTP/1.1" 404 -
+Feb 28 23:38:01 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:01] code 404, message Not Found
+Feb 28 23:38:01 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:01] "POST /_next HTTP/1.1" 404 -
+Feb 28 23:38:02 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:02] code 404, message Not Found
+Feb 28 23:38:02 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:02] "POST /api HTTP/1.1" 404 -
+Feb 28 23:38:03 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:03] code 404, message Not Found
+Feb 28 23:38:03 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:03] "POST /_next/server HTTP/1.1" 404 -
+Feb 28 23:38:03 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:03] code 404, message Not Found
+Feb 28 23:38:03 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:03] "POST /app HTTP/1.1" 404 -
+Feb 28 23:38:04 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:04] code 404, message Not Found
+Feb 28 23:38:04 bunker-hyper500 python3[1461685]: 193.32.162.28 - - [28/Feb/2026 23:38:04] "POST /api/route HTTP/1.1" 404 -
+Mar 01 02:01:33 bunker-hyper500 python3[1461685]: 35.203.210.61 - - [01/Mar/2026 02:01:33] code 404, message File not found
+Mar 01 02:01:33 bunker-hyper500 python3[1461685]: 35.203.210.61 - - [01/Mar/2026 02:01:33] "GET /.well-known/security.txt HTTP/1.1" 404 -
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: Stopping Pool Dashboard API...
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: pool-dashboard.service: Deactivated successfully.
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: Stopped Pool Dashboard API.
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: pool-dashboard.service: Consumed 4min 39.158s CPU time.
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: Started Pool Dashboard API.
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]: Serving at port 3333 from /opt/pool-dashboard
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]: Traceback (most recent call last):
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:   File "/opt/pool-dashboard/tools/server.py", line 60, in <module>
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:     with socketserver.TCPServer(("", PORT), Handler) as httpd:
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:   File "/usr/lib/python3.10/socketserver.py", line 452, in __init__
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:     self.server_bind()
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:   File "/usr/lib/python3.10/socketserver.py", line 466, in server_bind
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]:     self.socket.bind(self.server_address)
+Mar 04 16:48:14 bunker-hyper500 python3[1778395]: OSError: [Errno 98] Address already in use
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: pool-dashboard.service: Main process exited, code=exited, status=1/FAILURE
+Mar 04 16:48:14 bunker-hyper500 systemd[1]: pool-dashboard.service: Failed with result 'exit-code'.
+Mar 04 16:48:19 bunker-hyper500 systemd[1]: pool-dashboard.service: Scheduled restart job, restart counter is at 1.
+Mar 04 16:48:19 bunker-hyper500 systemd[1]: Stopped Pool Dashboard API.
+Mar 04 16:48:19 bunker-hyper500 systemd[1]: Started Pool Dashboard API.
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Serving at port 3333 from /opt/pool-dashboard
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Local dashboard server running at http://localhost:3333
+Mar 04 16:48:19 bunker-hyper500 python3[1778400]: Press Ctrl+C to stop.
+Mar 04 16:48:22 bunker-hyper500 python3[1778400]: 127.0.0.1 - - [04/Mar/2026 16:48:22] "POST /api/sync HTTP/1.0" 200 -
+Mar 04 16:48:22 bunker-hyper500 python3[1778400]: Received sync request...

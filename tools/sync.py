@@ -49,6 +49,9 @@ def main():
         
         # 2. Fetch collected fees
         run_script("fetch_collected_fees.py", [nft_id])
+
+        # 3. Update history
+        run_script("update_history.py", [nft_id])
     
     # 3. Generate multi-pool dashboard
     print(f"\n{'='*50}")
