@@ -98,6 +98,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 response = {"success": False, "message": str(e)}
                 self.wfile.write(json.dumps(response).encode())
+        elif self.path == '/api/update':
+            # Handle remote system update (git pull + pip install)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            try:
+                # 1. Pull from GitHub
+                pull_result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, timeout=60)
+                # 2. Update dependencies
+                pip_result = subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], capture_output=True, text=True, timeout=120)
+                
+                msg = f"Update Successful!\n{pull_result.stdout}"
+                response = {"success": True, "message": msg}
+            except Exception as e:
+                response = {"success": False, "message": f"Update failed: {str(e)}"}
+            
+            self.wfile.write(json.dumps(response).encode())
         else:
             self.send_error(404)
 
