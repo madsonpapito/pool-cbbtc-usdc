@@ -1,10 +1,11 @@
 
 >>> ls -la /opt/
-total 16
-drwxr-xr-x  4 root     root     4096 Feb 22 15:58 .
+total 20
+drwxr-xr-x  5 root     root     4096 Mar  4 22:32 .
 drwxr-xr-x 19 root     root     4096 Dec 24 00:23 ..
+drwx--x--x  4 root     root     4096 Mar  4 22:19 containerd
 drwxr-xr-x  4 root     root     4096 Dec 24 00:25 digitalocean
-drwxr-xr-x  7 www-data www-data 4096 Feb 22 15:58 pool-dashboard
+drwxr-xr-x  7 www-data www-data 4096 Mar  4 22:37 pool-dashboard
 
 >>> ls -la /var/www/
 total 12
@@ -14,7 +15,7 @@ drwxr-xr-x  2 root root 4096 Feb 20 12:06 html
 
 >>> ls -la /root/
 total 124
-drwx------  7 root root  4096 Feb 25 10:12 .
+drwx------  7 root root  4096 Mar  4 22:32 .
 drwxr-xr-x 19 root root  4096 Dec 24 00:23 ..
 -rw-------  1 root root 53994 Jan 31 23:07 .bash_history
 -rw-r--r--  1 root root  3106 Oct 15  2021 .bashrc
@@ -26,15 +27,17 @@ drwxr-xr-x  3 root root  4096 Dec 24 08:37 .local
 -rw-------  1 root root     5 Dec 26 13:39 .python_history
 drwx------  2 root root  4096 Dec 24 00:23 .ssh
 drwxr-xr-x  5 root root  4096 Jan 31 20:31 .venv
--rw-r--r--  1 root root   220 Mar  4 17:26 .wget-hsts
+-rw-r--r--  1 root root   220 Mar  9 21:20 .wget-hsts
 -rw-r--r--  1 root root 10054 Jan 31 21:37 bot_hybrid_squeeze.py
 -rw-r--r--  1 root root   430 Feb 22 15:48 fix_vps.py
 drwx------  3 root root  4096 Feb 25 10:12 snap
 
 >>> systemctl list-units --type=service --state=running
   UNIT                       LOAD   ACTIVE SUB     DESCRIPTION
+  containerd.service         loaded active running containerd container runtime
   cron.service               loaded active running Regular background program processing daemon
   dbus.service               loaded active running D-Bus System Message Bus
+  docker.service             loaded active running Docker Application Container Engine
   droplet-agent.service      loaded active running The DigitalOcean Droplet Agent
   getty@tty1.service         loaded active running Getty on tty1
   multipathd.service         loaded active running Device-Mapper Multipath Device Controller
@@ -57,29 +60,29 @@ drwx------  3 root root  4096 Feb 25 10:12 snap
 LOAD   = Reflects whether the unit definition was properly loaded.
 ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
 SUB    = The low-level unit activation state, values depend on unit type.
-20 loaded units listed.
+22 loaded units listed.
 
 >>> ps aux --sort=-%mem | head -20
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-root       13815  0.0 12.3 183080 120936 ?       S<s   2025  29:12 /lib/systemd/systemd-journald
-root     1780191  0.3  3.1  38904 31084 ?        S    17:44   0:01 /usr/bin/python3 tools/fetch_collected_fees.py 4227642
-root       25161  0.0  2.7 289316 27100 ?        SLsl  2025   8:52 /sbin/multipathd -d -s
-root      320897  0.0  2.3 1850876 23160 ?       Ssl  Jan07   3:45 /snap/snapd/current/usr/lib/snapd/snapd
-root     1780185  0.0  1.8 101852 17832 ?        Ssl  17:44   0:00 /usr/bin/python3 /opt/pool-dashboard/tools/server.py
-root     1780398  0.5  1.1  17156 10940 ?        Ss   17:51   0:00 sshd: root@notty
-root     1780189  0.0  1.0  18120  9992 ?        S    17:44   0:00 /usr/bin/python3 tools/sync.py
-root           1  0.0  1.0 167692  9948 ?        Ss    2025   8:22 /lib/systemd/systemd --system --deserialize 44
-root     1780396  0.4  1.0  16920  9844 ?        Ss   17:51   0:00 sshd: unknown [priv]
-systemd+   13812  0.0  0.8  26464  8756 ?        Ss    2025   0:20 /lib/systemd/systemd-resolved
-root       14941  0.0  0.7 296016  7152 ?        Ssl   2025   0:46 /usr/libexec/packagekitd
-root         706  0.0  0.5  24476  5740 ?        Ss    2025   0:08 /lib/systemd/systemd-logind
-sshd     1780397  0.0  0.5  15440  5460 ?        S    17:51   0:00 sshd: unknown [net]
-root       13593  0.0  0.5  15440  5232 ?        Ss    2025  11:49 sshd: /usr/sbin/sshd -D [listener] 1 of 10-100 startups
-root       13132  0.0  0.5  22916  5216 ?        Ss    2025   0:06 /lib/systemd/systemd-udevd
+root       13815  0.0 15.7 215932 153976 ?       S<s   2025  31:02 /lib/systemd/systemd-journald
+root       25161  0.0  2.7 289316 27100 ?        SLsl  2025   9:32 /sbin/multipathd -d -s
+root     1787808  0.0  2.2 1749628 22020 ?       Ssl  Mar04   0:44 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root      320897  0.0  2.1 1850876 21504 ?       Ssl  Jan07   4:06 /snap/snapd/current/usr/lib/snapd/snapd
+root     1888272  0.5  1.7  27984 17040 ?        Ss   21:44   0:00 /usr/bin/python3 /opt/pool-dashboard/tools/server.py
+root     1787309  0.1  1.7 1728392 16704 ?       Ssl  Mar04   8:06 /usr/bin/containerd
+root     1888307  0.5  1.1  17160 11076 ?        Ss   21:44   0:00 sshd: root@notty
+root           1  0.0  1.0 167584 10468 ?        Ss    2025   9:02 /lib/systemd/systemd --system --deserialize 44
+root     1888360  0.5  0.9  16320  9656 ?        Ss   21:44   0:00 sshd: root [priv]
+systemd+   13812  0.0  0.8  26464  8468 ?        Ss    2025   0:25 /lib/systemd/systemd-resolved
+root       14941  0.0  0.6 296016  6424 ?        Ssl   2025   0:50 /usr/libexec/packagekitd
+sshd     1888361  0.0  0.5  15440  5536 ?        S    21:44   0:00 sshd: root [net]
+root       31392  0.0  0.5  17096  5392 ?        Ss    2025   0:00 /lib/systemd/systemd --user
+root       13593  0.0  0.5  15440  5244 ?        Ss    2025  12:31 sshd: /usr/sbin/sshd -D [listener] 1 of 10-100 startups
+root         706  0.0  0.5  24476  5148 ?        Ss    2025   0:10 /lib/systemd/systemd-logind
 root       31394  0.0  0.5 170424  4996 ?        S     2025   0:00 (sd-pam)
-www-data 1462166  0.0  0.4  56204  4188 ?        S    Feb22   0:03 nginx: worker process
-syslog     15786  0.0  0.4 222404  3960 ?        Ssl   2025   6:02 /usr/sbin/rsyslogd -n -iNONE
-root       25160  0.0  0.4 234508  3948 ?        Ssl   2025   0:00 /usr/libexec/polkitd --no-debug
+www-data 1888121  0.0  0.5  55884  4940 ?        S    21:44   0:00 nginx: worker process
+syslog     15786  0.0  0.4 222404  4512 ?        Ssl   2025   6:25 /usr/sbin/rsyslogd -n -iNONE
+root       13132  0.0  0.4  11356  4112 ?        Ss    2025   0:07 /lib/systemd/systemd-udevd
 
 >>> cat /etc/nginx/sites-enabled/* 2>/dev/null || echo 'no sites-enabled'
 server {
@@ -90,13 +93,13 @@ server {
     index index.html;
     
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
     
     location /api/ {
         proxy_pass http://127.0.0.1:3333;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
         proxy_read_timeout 300;
     }
 }

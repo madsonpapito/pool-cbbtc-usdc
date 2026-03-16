@@ -24,7 +24,7 @@ def run_sync_background():
             [sys.executable, "tools/sync.py"],
             capture_output=True,
             text=True,
-            timeout=600  # 10 min hard limit
+            timeout=1800  # 30 min hard limit
         )
         
         if result.returncode == 0:
@@ -60,6 +60,44 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 response = {"success": True, "message": "Sync started! Dashboard will update in a few minutes."}
             
             self.wfile.write(json.dumps(response).encode())
+        elif self.path == '/api/manual':
+            # Handle manual data input
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            try:
+                data = json.loads(post_data.decode('utf-8'))
+                nft_id = data.get('nft_id')
+                
+                if not nft_id:
+                    raise ValueError("nft_id is required")
+                
+                # Create pool dir if not exists
+                pool_dir = f"tools/pools/{nft_id}"
+                os.makedirs(pool_dir, exist_ok=True)
+                
+                # Save manual data
+                manual_file = f"{pool_dir}/manual_data.json"
+                with open(manual_file, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                
+                # Regenerate dashboard immediately
+                subprocess.run([sys.executable, "tools/dashboard_gen_v3.py"], check=False)
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {"success": True, "message": f"Manual data saved for pool {nft_id}!"}
+                self.wfile.write(json.dumps(response).encode())
+                
+            except Exception as e:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {"success": False, "message": str(e)}
+                self.wfile.write(json.dumps(response).encode())
         else:
             self.send_error(404)
 

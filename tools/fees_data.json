@@ -1,15 +1,12 @@
 {
-  "nft_id": 4227642,
-<<<<<<< Updated upstream
-  "total_collected_usdc": 3.7277220000000004,
-  "total_collected_cbbtc": 4.486e-05,
-  "events_count": 6,
-  "last_scanned_block": 41939909,
-  "last_updated": "2026-02-09 22:58:20"
-=======
-  "total_collected_usdc": 2.698432,
-  "total_collected_cbbtc": 3.34e-05,
+  "nft_id": 4660395,
+  "total_collected_usdc": 6.890558000000001,
+  "total_collected_cbbtc": 0.00010021,
+  "raw_collected_usdc": 6.890558000000001,
+  "raw_collected_cbbtc": 0.00010021,
+  "withdrawn_usdc": 0,
+  "withdrawn_cbbtc": 0,
   "events_count": 4,
-  "last_updated": "2026-02-20 10:18:41"
->>>>>>> Stashed changes
+  "last_synced_block": 43441728,
+  "last_updated": "2026-03-16 14:53:59"
 }

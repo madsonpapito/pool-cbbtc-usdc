@@ -529,15 +529,127 @@
     }
   },
   {
-    "date": "2026-02-09 22:51:56",
-    "value_usd": 264.1786702801008,
+    "nft_id": 4227642,
+    "token0": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "token1": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "fee": 500,
+    "liquidity": 48380790,
+    "tick_lower": -70660,
+    "tick_upper": -65960,
+    "current_tick": -66049,
+    "in_range": true,
+    "amount0": 5.812126916998004,
+    "amount1": 0.0036660055668797215,
+    "price_cbbtc": 73846.2097492119,
+    "value_usd": 276.53274295057645,
     "fees_usd": 0.0,
-    "price_cbbtc": 70540.49724245026
+    "unclaimed_0": 0,
+    "unclaimed_1": 0,
+    "price_lower": 117103.90651575601,
+    "price_upper": 73191.92707253304,
+    "price_current": 73846.2097492119,
+    "timestamp": 1773665321,
+    "date": "2026-03-16 12:48:41",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73837.0
+    }
   },
   {
-    "date": "2026-02-09 22:58:20",
-    "value_usd": 264.4165262098685,
+    "nft_id": 4227642,
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "liquidity": 48380790,
+    "in_range": true,
+    "amount0": 6.336850050713366,
+    "amount1": 0.0036589025097102973,
+    "value_usd": 276.7491647704809,
     "fees_usd": 0.0,
-    "price_cbbtc": 70604.00909047376
+    "price_current": 73905.3073980859,
+    "last_updated": "2026-03-16T13:17:15.006361",
+    "timestamp": 1773667070,
+    "date": "2026-03-16 13:17:50",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73943.0
+    }
+  },
+  {
+    "nft_id": 4227642,
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "liquidity": 48380790,
+    "in_range": true,
+    "amount0": 7.03352264705089,
+    "amount1": 0.003649480565180192,
+    "value_usd": 277.0463416296502,
+    "fees_usd": 0.0,
+    "price_current": 73986.64389633968,
+    "last_updated": "2026-03-16T13:58:12.598628",
+    "timestamp": 1773669542,
+    "date": "2026-03-16 13:59:02",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73970.0
+    }
+  },
+  {
+    "nft_id": 4227642,
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "liquidity": 48380790,
+    "in_range": true,
+    "amount0": 7.604088920450927,
+    "amount1": 0.0036417715364180786,
+    "value_usd": 277.2621721592723,
+    "fees_usd": 0.0,
+    "price_current": 74045.85393186082,
+    "last_updated": "2026-03-16T13:59:34.077554",
+    "timestamp": 1773669650,
+    "date": "2026-03-16 14:00:50",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73968.0
+    }
+  },
+  {
+    "nft_id": 4227642,
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "liquidity": 48380790,
+    "in_range": true,
+    "amount0": 8.524468686337661,
+    "amount1": 0.003629350184831629,
+    "value_usd": 277.6392806567989,
+    "fees_usd": 0.0,
+    "price_current": 74149.5855360526,
+    "last_updated": "2026-03-16T14:02:03.344964",
+    "timestamp": 1773669759,
+    "date": "2026-03-16 14:02:39",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73990.0
+    }
+  },
+  {
+    "nft_id": 4227642,
+    "symbol0": "USDC",
+    "symbol1": "cbBTC",
+    "liquidity": 48380790,
+    "in_range": true,
+    "amount0": 0.8569325117859492,
+    "amount1": 0.0037333635487592966,
+    "value_usd": 274.4918067683412,
+    "fees_usd": 0.0,
+    "price_current": 73294.46240173742,
+    "last_updated": "2026-03-16T14:52:43.996181",
+    "timestamp": 1773672799,
+    "date": "2026-03-16 14:53:19",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73146.0
+    }
   }
 ]

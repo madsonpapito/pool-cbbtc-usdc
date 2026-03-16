@@ -88,39 +88,39 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <h1 class="text-lg font-bold text-white">📊 Pool Tracker</h1>
-                <p class="text-xs text-gray-500 mt-1">2026-02-20 11:49</p>
+                <p class="text-xs text-gray-500 mt-1">2026-03-16 14:54</p>
             </div>
             
             <!-- Portfolio Summary -->
             <div class="sidebar-portfolio">
                 <p class="text-xs text-gray-400 mb-1">Portfolio Total</p>
-                <p class="text-xl font-bold text-white">$645.13</p>
+                <p class="text-xl font-bold text-white">$671.42</p>
                 <div class="flex justify-between mt-2">
                     <div>
                         <p class="text-xs text-gray-500">PnL</p>
-                        <p class="text-sm font-medium text-danger">$-58.85</p>
+                        <p class="text-sm font-medium text-danger">$-18.14</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Fees</p>
-                        <p class="text-sm font-medium text-yellow-400">$4.96</p>
+                        <p class="text-sm font-medium text-yellow-400">$19.38</p>
                     </div>
                 </div>
             </div>
             
             <div class="sidebar-divider"></div>
-            <p class="text-xs text-gray-500 px-2 mb-1">POSITIONS (2)</p>
+            <p class="text-xs text-gray-500 px-2 mb-1">POSITIONS (3)</p>
             
             <!-- Pool Items -->
             
         <div class="sidebar-item sidebar-active" onclick="switchPool('4227642', this)" data-pool="4227642">
             <div class="flex justify-between items-center mb-1">
-                <span class="text-sm font-medium text-white">🔴 #4227642</span>
-                <span class="text-xs text-gray-500">Out</span>
+                <span class="text-sm font-medium text-white">🟢 #4227642</span>
+                <span class="text-xs text-gray-500">In Range</span>
             </div>
             <div class="text-xs text-gray-400 mb-2">USDC/cbBTC 0.05%</div>
             <div class="flex justify-between items-center">
-                <span class="text-sm font-bold text-white">$253.59</span>
-                <span class="text-xs text-danger">$-60.10</span>
+                <span class="text-sm font-bold text-white">$274.49</span>
+                <span class="text-xs text-danger">$-39.01</span>
             </div>
         </div>
         
@@ -131,8 +131,20 @@
             </div>
             <div class="text-xs text-gray-400 mb-2">USDC/cbBTC 0.05%</div>
             <div class="flex justify-between items-center">
-                <span class="text-sm font-bold text-white">$391.54</span>
-                <span class="text-xs text-accent">+$1.25</span>
+                <span class="text-sm font-bold text-white">$396.93</span>
+                <span class="text-xs text-accent">+$20.88</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-item " onclick="switchPool('999001', this)" data-pool="999001">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-sm font-medium text-white">🟢 #999001</span>
+                <span class="text-xs text-gray-500">In Range</span>
+            </div>
+            <div class="text-xs text-gray-400 mb-2">SOL/USDC 0.05%</div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-bold text-white">$0.00</span>
+                <span class="text-xs text-accent">+$0.00</span>
             </div>
         </div>
         
@@ -156,10 +168,13 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h2 class="text-xl font-bold text-white">USDC/cbBTC <span class="text-sm text-gray-500">NFT #4227642</span></h2>
-                <p class="text-sm text-gray-500">Base Network | Uniswap V3 | Fee: 0.05%</p>
+                <p class="text-sm text-gray-500">Base | Uniswap V3</p>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-red-400 text-sm font-medium">🔴 Out of Range</span>
+                <button onclick="openManualModal('4227642')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-md border border-gray-700 transition">
+                    ⚙️ Manual Backup
+                </button>
+                <span class="text-green-400 text-sm font-medium">🟢 In Range</span>
             </div>
         </div>
 
@@ -167,24 +182,24 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div class="gradient-border"><div class="gradient-border-inner p-5">
                 <p class="text-gray-500 text-xs mb-1">Pooled Assets</p>
-                <p class="text-2xl font-bold text-white">$253.59</p>
-                <p class="text-xs text-gray-500">88.5 Days Active</p>
+                <p class="text-2xl font-bold text-white">$274.49</p>
+                <p class="text-xs text-gray-500">112.6 Days Active</p>
             </div></div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total PnL</p>
                 <p class="text-2xl font-bold text-danger">
-                    $-60.10
+                    $-39.01
                 </p>
-                <p class="text-xs text-danger">-18.86% ROI</p>
+                <p class="text-xs text-danger">-12.24% ROI</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Fee APR</p>
-                <p class="text-2xl font-bold text-yellow-400">6.42%</p>
+                <p class="text-2xl font-bold text-yellow-400">5.23%</p>
                 <p class="text-xs text-gray-500">From fees only</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total APR</p>
-                <p class="text-2xl font-bold text-danger">-77.79%</p>
+                <p class="text-2xl font-bold text-danger">-39.68%</p>
                 <p class="text-xs text-gray-500">Incl. value change</p>
             </div>
         </div>
@@ -193,33 +208,42 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Impermanent Loss</p>
-                <p class="text-2xl font-bold text-danger">
-                    -0.90%
+                <p class="text-2xl font-bold text-warning">
+                    -0.45%
                 </p>
-                <p class="text-xs text-gray-500">Price ratio: 0.76x</p>
+                <p class="text-xs text-gray-500">Price ratio: 0.83x</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
                 <div class="flex items-baseline gap-2">
-                    <p class="text-2xl font-bold text-yellow-400">$4.96</p>
+                    <p class="text-2xl font-bold text-yellow-400">$5.15</p>
                 </div>
                 <div class="text-xs text-gray-500 mt-1">
-                    <span>collected: <span class="text-gray-300">$4.96</span></span> |
+                    <span>collected: <span class="text-gray-300">$5.15</span></span> |
                     <span>pending: <span class="text-gray-300">$0.00</span></span>
                 </div>
+                
+                <div class="mt-2 pt-2 border-t border-gray-800">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Backup Manual (Self-Reported)</p>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-yellow-500/80">cbBTC: 500.00</span>
+                        <span class="text-yellow-500/80">USDC: 0.010000</span>
+                    </div>
+                </div>
+                
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
                 <p class="text-2xl font-bold text-danger">
-                    $-22.42
+                    $-11.36
                 </p>
-                <p class="text-xs text-gray-500">HODL: $280.97</p>
+                <p class="text-xs text-gray-500">HODL: $291.00</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">cbBTC Price</p>
-                <p class="text-2xl font-bold text-white">$67,714</p>
+                <p class="text-gray-500 text-xs mb-1">USDC Price</p>
+                <p class="text-2xl font-bold text-white">$0.00</p>
                 <p class="text-xs text-danger">
-                    -23.6% since deposit
+                    -17.4% since deposit
                 </p>
             </div>
         </div>
@@ -232,15 +256,15 @@
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Position Age</p>
-                <p class="text-xl font-bold text-white">88.5 days</p>
+                <p class="text-xl font-bold text-white">112.6 days</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Deposit Date</p>
                 <p class="text-xl font-bold text-white">2025-11-24</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">Initial cbBTC Price</p>
-                <p class="text-xl font-bold text-white">$88,685</p>
+                <p class="text-gray-500 text-xs mb-1">Initial USDC Price</p>
+                <p class="text-xl font-bold text-white">$88,685.00</p>
             </div>
         </div>
 
@@ -251,28 +275,28 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-gray-300">USDC</span>
-                        <span class="font-mono text-xl text-white">0.000000</span>
+                        <span class="font-mono text-xl text-white">0.856933</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-300">cbBTC</span>
-                        <span class="font-mono text-xl text-white">0.00374506</span>
+                        <span class="font-mono text-xl text-white">0.00373336</span>
                     </div>
                 </div>
             </div>
             <div class="card p-5">
-                <h3 class="text-sm text-gray-400 mb-4">Price Range (cbBTC/USDC)</h3>
+                <h3 class="text-sm text-gray-400 mb-4">Price Range (USDC/cbBTC)</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-gray-300">MIN</span>
-                        <span class="font-mono text-cyan-400">$73,192</span>
+                        <span class="font-mono text-cyan-400">$0</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-300">MAX</span>
-                        <span class="font-mono text-cyan-400">$117,104</span>
+                        <span class="font-mono text-cyan-400">$0</span>
                     </div>
                     <div class="flex justify-between pt-2 border-t border-gray-700">
                         <span class="text-gray-300">Current Price</span>
-                        <span class="font-mono text-red-400">$67,714</span>
+                        <span class="font-mono text-green-400">$73,294</span>
                     </div>
                 </div>
             </div>
@@ -288,21 +312,21 @@
         <div class="card p-6 mb-4">
             <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 Projected Yield</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div title="Return: 0.0176%">
+                <div title="Return: 0.0143%">
                     <p class="text-gray-500 text-xs">Daily</p>
-                    <p class="text-white font-mono text-lg">$0.0561</p>
+                    <p class="text-white font-mono text-lg">$0.0457</p>
                 </div>
-                <div title="Return: 0.1231%">
+                <div title="Return: 0.1004%">
                     <p class="text-gray-500 text-xs">Weekly</p>
-                    <p class="text-white font-mono text-lg">$0.3924</p>
+                    <p class="text-white font-mono text-lg">$0.3199</p>
                 </div>
-                <div title="Return: 0.53%">
+                <div title="Return: 0.43%">
                     <p class="text-gray-500 text-xs">Monthly</p>
-                    <p class="text-white font-mono text-lg">$1.68</p>
+                    <p class="text-white font-mono text-lg">$1.37</p>
                 </div>
-                <div title="Return: 6.42%">
+                <div title="Return: 5.23%">
                     <p class="text-gray-500 text-xs">Yearly</p>
-                    <p class="text-white font-mono text-lg">$20.46</p>
+                    <p class="text-white font-mono text-lg">$16.68</p>
                 </div>
             </div>
         </div>
@@ -313,9 +337,12 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h2 class="text-xl font-bold text-white">USDC/cbBTC <span class="text-sm text-gray-500">NFT #4660395</span></h2>
-                <p class="text-sm text-gray-500">Base Network | Uniswap V3 | Fee: 0.05%</p>
+                <p class="text-sm text-gray-500">Base | Uniswap V3</p>
             </div>
             <div class="flex items-center gap-3">
+                <button onclick="openManualModal('4660395')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-md border border-gray-700 transition">
+                    ⚙️ Manual Backup
+                </button>
                 <span class="text-green-400 text-sm font-medium">🟢 In Range</span>
             </div>
         </div>
@@ -324,24 +351,24 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div class="gradient-border"><div class="gradient-border-inner p-5">
                 <p class="text-gray-500 text-xs mb-1">Pooled Assets</p>
-                <p class="text-2xl font-bold text-white">$391.54</p>
-                <p class="text-xs text-gray-500">2.5 Days Active</p>
+                <p class="text-2xl font-bold text-white">$396.93</p>
+                <p class="text-xs text-gray-500">26.6 Days Active</p>
             </div></div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total PnL</p>
                 <p class="text-2xl font-bold text-accent">
-                    +$1.25
+                    +$20.88
                 </p>
-                <p class="text-xs text-accent">+0.32% ROI</p>
+                <p class="text-xs text-accent">+5.35% ROI</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Fee APR</p>
-                <p class="text-2xl font-bold text-yellow-400">0.00%</p>
+                <p class="text-2xl font-bold text-yellow-400">50.02%</p>
                 <p class="text-xs text-gray-500">From fees only</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total APR</p>
-                <p class="text-2xl font-bold text-accent">46.75%</p>
+                <p class="text-2xl font-bold text-accent">73.34%</p>
                 <p class="text-xs text-gray-500">Incl. value change</p>
             </div>
         </div>
@@ -351,32 +378,33 @@
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Impermanent Loss</p>
                 <p class="text-2xl font-bold text-warning">
-                    -0.00%
+                    -0.09%
                 </p>
-                <p class="text-xs text-gray-500">Price ratio: 1.01x</p>
+                <p class="text-xs text-gray-500">Price ratio: 1.09x</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
                 <div class="flex items-baseline gap-2">
-                    <p class="text-2xl font-bold text-yellow-400">$0.00</p>
+                    <p class="text-2xl font-bold text-yellow-400">$14.24</p>
                 </div>
                 <div class="text-xs text-gray-500 mt-1">
-                    <span>collected: <span class="text-gray-300">$0.00</span></span> |
+                    <span>collected: <span class="text-gray-300">$14.24</span></span> |
                     <span>pending: <span class="text-gray-300">$0.00</span></span>
                 </div>
+                
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
-                <p class="text-2xl font-bold text-danger">
-                    $-0.54
+                <p class="text-2xl font-bold text-accent">
+                    +$3.11
                 </p>
-                <p class="text-xs text-gray-500">HODL: $392.08</p>
+                <p class="text-xs text-gray-500">HODL: $408.05</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">cbBTC Price</p>
-                <p class="text-2xl font-bold text-white">$67,815</p>
+                <p class="text-gray-500 text-xs mb-1">USDC Price</p>
+                <p class="text-2xl font-bold text-white">$0.00</p>
                 <p class="text-xs text-accent">
-                    +0.9% since deposit
+                    +9.1% since deposit
                 </p>
             </div>
         </div>
@@ -389,15 +417,15 @@
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Position Age</p>
-                <p class="text-xl font-bold text-white">2.5 days</p>
+                <p class="text-xl font-bold text-white">26.6 days</p>
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">Deposit Date</p>
                 <p class="text-xl font-bold text-white">2026-02-18</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">Initial cbBTC Price</p>
-                <p class="text-xl font-bold text-white">$67,200</p>
+                <p class="text-gray-500 text-xs mb-1">Initial USDC Price</p>
+                <p class="text-xl font-bold text-white">$67,200.00</p>
             </div>
         </div>
 
@@ -408,28 +436,28 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-gray-300">USDC</span>
-                        <span class="font-mono text-xl text-white">261.272694</span>
+                        <span class="font-mono text-xl text-white">391.157630</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-300">cbBTC</span>
-                        <span class="font-mono text-xl text-white">0.00192085</span>
+                        <span class="font-mono text-xl text-white">0.00007870</span>
                     </div>
                 </div>
             </div>
             <div class="card p-5">
-                <h3 class="text-sm text-gray-400 mb-4">Price Range (cbBTC/USDC)</h3>
+                <h3 class="text-sm text-gray-400 mb-4">Price Range (USDC/cbBTC)</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-gray-300">MIN</span>
-                        <span class="font-mono text-cyan-400">$57,403</span>
+                        <span class="font-mono text-cyan-400">$0</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-300">MAX</span>
-                        <span class="font-mono text-cyan-400">$73,559</span>
+                        <span class="font-mono text-cyan-400">$0</span>
                     </div>
                     <div class="flex justify-between pt-2 border-t border-gray-700">
                         <span class="text-gray-300">Current Price</span>
-                        <span class="font-mono text-green-400">$67,815</span>
+                        <span class="font-mono text-green-400">$73,316</span>
                     </div>
                 </div>
             </div>
@@ -439,6 +467,167 @@
         <div class="card p-6 mb-6">
             <h3 class="text-sm font-semibold text-gray-300 mb-4">Value History</h3>
             <canvas id="chart-4660395" height="100"></canvas>
+        </div>
+
+        <!-- Projections -->
+        <div class="card p-6 mb-4">
+            <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 Projected Yield</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div title="Return: 0.1370%">
+                    <p class="text-gray-500 text-xs">Daily</p>
+                    <p class="text-white font-mono text-lg">$0.5348</p>
+                </div>
+                <div title="Return: 0.9592%">
+                    <p class="text-gray-500 text-xs">Weekly</p>
+                    <p class="text-white font-mono text-lg">$3.7438</p>
+                </div>
+                <div title="Return: 4.11%">
+                    <p class="text-gray-500 text-xs">Monthly</p>
+                    <p class="text-white font-mono text-lg">$16.04</p>
+                </div>
+                <div title="Return: 50.02%">
+                    <p class="text-gray-500 text-xs">Yearly</p>
+                    <p class="text-white font-mono text-lg">$195.21</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pool-999001" class="pool-content" style="display: none;">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-white">SOL/USDC <span class="text-sm text-gray-500">NFT #999001</span></h2>
+                <p class="text-sm text-gray-500">Base | Uniswap V3</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openManualModal('999001')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-md border border-gray-700 transition">
+                    ⚙️ Manual Backup
+                </button>
+                <span class="text-green-400 text-sm font-medium">🟢 In Range</span>
+            </div>
+        </div>
+
+        <!-- KPI Row 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="gradient-border"><div class="gradient-border-inner p-5">
+                <p class="text-gray-500 text-xs mb-1">Pooled Assets</p>
+                <p class="text-2xl font-bold text-white">$0.00</p>
+                <p class="text-xs text-gray-500">439.6 Days Active</p>
+            </div></div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Total PnL</p>
+                <p class="text-2xl font-bold text-accent">
+                    +$0.00
+                </p>
+                <p class="text-xs text-accent">+0.00% ROI</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Fee APR</p>
+                <p class="text-2xl font-bold text-yellow-400">0.00%</p>
+                <p class="text-xs text-gray-500">From fees only</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Total APR</p>
+                <p class="text-2xl font-bold text-accent">0.00%</p>
+                <p class="text-xs text-gray-500">Incl. value change</p>
+            </div>
+        </div>
+
+        <!-- KPI Row 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Impermanent Loss</p>
+                <p class="text-2xl font-bold text-accent">
+                    +0.00%
+                </p>
+                <p class="text-xs text-gray-500">Price ratio: 1.00x</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Total Fees Earned</p>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-2xl font-bold text-yellow-400">$0.00</p>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                    <span>collected: <span class="text-gray-300">$0.00</span></span> |
+                    <span>pending: <span class="text-gray-300">$0.00</span></span>
+                </div>
+                
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
+                <p class="text-2xl font-bold text-accent">
+                    +$0.00
+                </p>
+                <p class="text-xs text-gray-500">HODL: $0.00</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">SOL Price</p>
+                <p class="text-2xl font-bold text-white">$0.00</p>
+                <p class="text-xs text-accent">
+                    +0.0% since deposit
+                </p>
+            </div>
+        </div>
+
+        <!-- KPI Row 3 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Initial Investment</p>
+                <p class="text-xl font-bold text-white">$0.00</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Position Age</p>
+                <p class="text-xl font-bold text-white">439.6 days</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Deposit Date</p>
+                <p class="text-xl font-bold text-white">2025-01-01</p>
+            </div>
+            <div class="card p-5">
+                <p class="text-gray-500 text-xs mb-1">Initial SOL Price</p>
+                <p class="text-xl font-bold text-white">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Token Balances & Range -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="card p-5">
+                <h3 class="text-sm text-gray-400 mb-4">Token Balances</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">SOL</span>
+                        <span class="font-mono text-xl text-white">0.000000</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">USDC</span>
+                        <span class="font-mono text-xl text-white">0.00000000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-5">
+                <h3 class="text-sm text-gray-400 mb-4">Price Range (SOL/USDC)</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">MIN</span>
+                        <span class="font-mono text-cyan-400">$0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">MAX</span>
+                        <span class="font-mono text-cyan-400">$0</span>
+                    </div>
+                    <div class="flex justify-between pt-2 border-t border-gray-700">
+                        <span class="text-gray-300">Current Price</span>
+                        <span class="font-mono text-green-400">$145</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card p-6 mb-6">
+            <h3 class="text-sm font-semibold text-gray-300 mb-4">Value History</h3>
+            <canvas id="chart-999001" height="100"></canvas>
         </div>
 
         <!-- Projections -->
@@ -465,6 +654,40 @@
         </div>
     </div>
     
+        </div>
+    </div>
+
+    <!-- Manual Input Modal -->
+    <div id="manualModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="card w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-white">Manual Backup Input</h3>
+                <button onclick="closeManualModal()" class="text-gray-500 hover:text-white">✕</button>
+            </div>
+            
+            <form id="manualForm" onsubmit="submitManual(event)" class="space-y-4">
+                <input type="hidden" id="modalNftId" name="nft_id">
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 uppercase font-bold">Total Collected USDC</label>
+                    <input type="number" step="any" id="modalUsdc" name="collected_usdc" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 uppercase font-bold">Total Collected cbBTC</label>
+                    <input type="number" step="any" id="modalCbbtc" name="collected_cbbtc" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500" required>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" id="manualSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                        Save Backup Data
+                    </button>
+                </div>
+                
+                <p class="text-[10px] text-gray-600 italic mt-2">
+                    * This data will be saved locally as a reference. It does not overwrite blockchain sync records.
+                </p>
+            </form>
         </div>
     </div>
 
@@ -487,15 +710,56 @@
             }
         }
 
+        function openManualModal(nftId) {
+            document.getElementById('modalNftId').value = nftId;
+            document.getElementById('modalUsdc').value = ''; // Clear previous values
+            document.getElementById('modalCbbtc').value = ''; // Clear previous values
+            document.getElementById('manualModal').style.display = 'flex';
+        }
+
+        function closeManualModal() {
+            document.getElementById('manualModal').style.display = 'none';
+        }
+
+        async function submitManual(event) {
+            event.preventDefault();
+            const btn = document.getElementById('manualSubmitBtn');
+            const nftId = document.getElementById('modalNftId').value;
+            const usdc = document.getElementById('modalUsdc').value;
+            const cbbtc = document.getElementById('modalCbbtc').value;
+            
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nft_id: nftId,
+                        collected_usdc: parseFloat(usdc),
+                        collected_cbbtc: parseFloat(cbbtc),
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Manual data saved!');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Request failed: ' + error.message);
+            } finally {
+                btn.innerHTML = 'Save Backup Data';
+                btn.disabled = false;
+            }
+        }
+
         async function syncData() {
             const btn = document.getElementById('syncBtn');
-            const isVercel = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
-            
-            if (isVercel) {
-                alert('Sync só funciona localmente.\nPara atualizar no Vercel:\n1. python tools/sync.py\n2. git push');
-                return;
-            }
-            
             btn.innerHTML = 'Syncing...';
             btn.disabled = true;
             btn.classList.add('opacity-75');
@@ -503,18 +767,51 @@
             try {
                 const response = await fetch('/api/sync', { method: 'POST' });
                 const data = await response.json();
+                
                 if (data.success) {
-                    alert('Sync complete!');
-                    window.location.reload();
+                    // Start polling for completion
+                    let attempts = 0;
+                    const maxAttempts = 60; // 5 minutes (5s interval)
+                    
+                    const poll = setInterval(async () => {
+                        attempts++;
+                        try {
+                            const statusResp = await fetch('/api/sync/status');
+                            const statusData = await statusResp.json();
+                            
+                            if (!statusData.running) {
+                                clearInterval(poll);
+                                if (statusData.last_result && statusData.last_result.success) {
+                                    alert('Sync complete!');
+                                } else if (statusData.last_result) {
+                                    alert('Sync finished with error: ' + statusData.last_result.message);
+                                } else {
+                                    alert('Sync finished!');
+                                }
+                                window.location.reload();
+                            }
+                            
+                            if (attempts >= maxAttempts) {
+                                clearInterval(poll);
+                                alert('Sync is taking longer than expected. Please check back in a few minutes.');
+                                window.location.reload();
+                            }
+                        } catch (e) {
+                            console.error('Polling error:', e);
+                        }
+                    }, 5000);
                 } else {
                     alert('Error: ' + data.message);
+                    btn.innerHTML = 'Sync All Pools';
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75');
                 }
             } catch (error) {
                 alert('Connection failed. Make sure server.py is running.');
+                btn.innerHTML = 'Sync All Pools';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
             }
-            btn.innerHTML = 'Sync All Pools';
-            btn.disabled = false;
-            btn.classList.remove('opacity-75');
         }
 
         // Initialize charts
@@ -522,10 +819,10 @@
         charts['4227642'] = new Chart(document.getElementById('chart-4227642'), {
             type: 'line',
             data: {
-                labels: ["2026-01-23", "2026-01-23", "2026-01-23", "2026-01-23", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-27", "2026-01-29"],
+                labels: ["2026-01-23", "2026-01-23", "2026-01-23", "2026-01-23", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-25", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-26", "2026-01-27", "2026-01-29", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16"],
                 datasets: [{
                     label: 'Value USD',
-                    data: [253.59225971298474, 69.1878640082986, 119.7431143720223, 119.89784821933989, 117.32191095346698, 117.20569028351044, 117.31571539303695, 117.39130885243989, 117.338303263548, 118.53346798019501, 118.41335807563121, 118.4182727037952, 118.33799546524656, 118.37011536954361, 118.47635507248232, 118.55057373710636, 118.57260648313786, 118.4886414759556, 118.38875544748166, 118.35841885827496, 307.14868791083984],
+                    data: [274.4918067683412, 69.1878640082986, 119.7431143720223, 119.89784821933989, 117.32191095346698, 117.20569028351044, 117.31571539303695, 117.39130885243989, 117.338303263548, 118.53346798019501, 118.41335807563121, 118.4182727037952, 118.33799546524656, 118.37011536954361, 118.47635507248232, 118.55057373710636, 118.57260648313786, 118.4886414759556, 118.38875544748166, 118.35841885827496, 307.14868791083984, 276.53274295057645, 276.7491647704809, 277.0463416296502, 277.2621721592723, 277.6392806567989, 274.4918067683412],
                     borderColor: '#2ea043',
                     backgroundColor: 'rgba(46, 160, 67, 0.1)',
                     fill: true,
@@ -544,10 +841,32 @@
         charts['4660395'] = new Chart(document.getElementById('chart-4660395'), {
             type: 'line',
             data: {
-                labels: ["2026-02-20"],
+                labels: ["2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16"],
                 datasets: [{
                     label: 'Value USD',
-                    data: [391.53615130376966],
+                    data: [396.9368797603591, 396.9368797603591, 396.9368797603591, 396.9368797603591, 396.9368797603591, 396.92763731548257],
+                    borderColor: '#2ea043',
+                    backgroundColor: 'rgba(46, 160, 67, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#21262d' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+        
+        charts['999001'] = new Chart(document.getElementById('chart-999001'), {
+            type: 'line',
+            data: {
+                labels: ["2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16", "2026-03-16"],
+                datasets: [{
+                    label: 'Value USD',
+                    data: [0.0, 0.0, 0.0, 0.0, 0.0],
                     borderColor: '#2ea043',
                     backgroundColor: 'rgba(46, 160, 67, 0.1)',
                     fill: true,

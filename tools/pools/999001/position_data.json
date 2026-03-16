@@ -1,0 +1,14 @@
+{
+  "nft_id": 999001,
+  "symbol0": "SOL",
+  "symbol1": "USDC",
+  "liquidity": 0,
+  "in_range": true,
+  "amount0": 0.0,
+  "amount1": 0.0,
+  "value_usd": 0.0,
+  "fees_usd": 0.0,
+  "price_current": 145.0,
+  "last_updated": "2026-03-16T13:18:10.823736",
+  "note": "Alpha integration - data fetching pending RPC config"
+}

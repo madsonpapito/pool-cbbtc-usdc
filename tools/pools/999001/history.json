@@ -1,0 +1,102 @@
+[
+  {
+    "nft_id": 999001,
+    "symbol0": "SOL",
+    "symbol1": "USDC",
+    "liquidity": 0,
+    "in_range": true,
+    "amount0": 0.0,
+    "amount1": 0.0,
+    "value_usd": 0.0,
+    "fees_usd": 0.0,
+    "price_current": 145.0,
+    "last_updated": "2026-03-16T13:18:10.823736",
+    "note": "Alpha integration - data fetching pending RPC config",
+    "timestamp": 1773667093,
+    "date": "2026-03-16 13:18:13",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73943.0
+    }
+  },
+  {
+    "nft_id": 999001,
+    "symbol0": "SOL",
+    "symbol1": "USDC",
+    "liquidity": 0,
+    "in_range": true,
+    "amount0": 0.0,
+    "amount1": 0.0,
+    "value_usd": 0.0,
+    "fees_usd": 0.0,
+    "price_current": 145.0,
+    "last_updated": "2026-03-16T13:18:10.823736",
+    "note": "Alpha integration - data fetching pending RPC config",
+    "timestamp": 1773669616,
+    "date": "2026-03-16 14:00:16",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73968.0
+    }
+  },
+  {
+    "nft_id": 999001,
+    "symbol0": "SOL",
+    "symbol1": "USDC",
+    "liquidity": 0,
+    "in_range": true,
+    "amount0": 0.0,
+    "amount1": 0.0,
+    "value_usd": 0.0,
+    "fees_usd": 0.0,
+    "price_current": 145.0,
+    "last_updated": "2026-03-16T13:18:10.823736",
+    "note": "Alpha integration - data fetching pending RPC config",
+    "timestamp": 1773669660,
+    "date": "2026-03-16 14:01:00",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 68000.0
+    }
+  },
+  {
+    "nft_id": 999001,
+    "symbol0": "SOL",
+    "symbol1": "USDC",
+    "liquidity": 0,
+    "in_range": true,
+    "amount0": 0.0,
+    "amount1": 0.0,
+    "value_usd": 0.0,
+    "fees_usd": 0.0,
+    "price_current": 145.0,
+    "last_updated": "2026-03-16T13:18:10.823736",
+    "note": "Alpha integration - data fetching pending RPC config",
+    "timestamp": 1773669768,
+    "date": "2026-03-16 14:02:48",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73990.0
+    }
+  },
+  {
+    "nft_id": 999001,
+    "symbol0": "SOL",
+    "symbol1": "USDC",
+    "liquidity": 0,
+    "in_range": true,
+    "amount0": 0.0,
+    "amount1": 0.0,
+    "value_usd": 0.0,
+    "fees_usd": 0.0,
+    "price_current": 145.0,
+    "last_updated": "2026-03-16T13:18:10.823736",
+    "note": "Alpha integration - data fetching pending RPC config",
+    "timestamp": 1773672845,
+    "date": "2026-03-16 14:54:05",
+    "prices": {
+      "USDC": 1.0,
+      "cbBTC": 73184.0
+    }
+  }
+]

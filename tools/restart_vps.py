@@ -23,7 +23,7 @@ run("killall -9 python3 2>/dev/null; sleep 2; echo killed")
 
 # 2. Upload new server.py with SO_REUSEADDR
 sftp = client.open_sftp()
-sftp.put("c:/POOL-BTC-USD/tools/server.py", "/opt/pool-dashboard/tools/server.py")
+sftp.put("c:/Users/madso/OneDrive/Área de Trabalho/AIOS/pool-cbbtc-usdc/tools/server.py", "/opt/pool-dashboard/tools/server.py")
 sftp.close()
 print("\nUploaded new server.py")
 run("chown www-data:www-data /opt/pool-dashboard/tools/server.py")

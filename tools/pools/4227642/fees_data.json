@@ -2,6 +2,11 @@
   "nft_id": 4227642,
   "total_collected_usdc": 2.698432,
   "total_collected_cbbtc": 3.34e-05,
+  "raw_collected_usdc": 2.698432,
+  "raw_collected_cbbtc": 3.34e-05,
+  "withdrawn_usdc": 0,
+  "withdrawn_cbbtc": 0,
   "events_count": 4,
-  "last_updated": "2026-02-20 10:18:41"
+  "last_synced_block": 43441708,
+  "last_updated": "2026-03-16 14:53:18"
 }

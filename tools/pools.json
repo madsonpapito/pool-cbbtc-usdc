@@ -1,20 +1,33 @@
 {
-    "pools": [
-        {
-            "nft_id": 4227642,
-            "label": "USDC/cbBTC 0.05% (Range: 73k-117k)",
-            "version": "v3",
-            "total_invested_usd": 318.65,
-            "deposit_date": "2025-11-24",
-            "initial_cbbtc_price": 88685
-        },
-        {
-            "nft_id": 4660395,
-            "label": "USDC/cbBTC 0.05% (Range: 57k-73k)",
-            "version": "v3",
-            "total_invested_usd": 390.29,
-            "deposit_date": "2026-02-18",
-            "initial_cbbtc_price": 67200
-        }
-    ]
+  "pools": [
+    {
+      "nft_id": 4227642,
+      "label": "USDC/cbBTC 0.05% (Range: 73k-117k)",
+      "exchange": "uniswap_v3",
+      "network": "base",
+      "version": "v3",
+      "total_invested_usd": 318.65,
+      "deposit_date": "2025-11-24",
+      "initial_cbbtc_price": 88685,
+      "start_block": 38476527
+    },
+    {
+      "nft_id": 4660395,
+      "label": "USDC/cbBTC 0.05% (Range: 57k-73k)",
+      "exchange": "uniswap_v3",
+      "network": "base",
+      "version": "v3",
+      "total_invested_usd": 390.29,
+      "deposit_date": "2026-02-18",
+      "initial_cbbtc_price": 67200,
+      "start_block": 42191727
+    },
+    {
+      "nft_id": 999001,
+      "label": "SOL/USDC (ByReal Alpha)",
+      "exchange": "byreal",
+      "network": "solana",
+      "pool_address": "ByRealPoolAddressPlaceholder123"
+    }
+  ]
 }

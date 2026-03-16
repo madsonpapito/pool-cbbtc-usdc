@@ -44,8 +44,13 @@ def load_pool_data(nft_id):
         with open(f"{pool_dir}/history.json", "r") as f: history = json.load(f)
     except FileNotFoundError:
         history = []
+
+    try:
+        with open(f"{pool_dir}/manual_data.json", "r") as f: manual = json.load(f)
+    except FileNotFoundError:
+        manual = None
     
-    return {"pos": pos, "config": config, "fees": fees_data, "history": history}
+    return {"pos": pos, "config": config, "fees": fees_data, "history": history, "manual": manual}
 
 def calc_metrics(pool_entry, pool_data):
     """Calculate all metrics for a pool"""
@@ -53,6 +58,7 @@ def calc_metrics(pool_entry, pool_data):
     config = pool_data["config"]
     fees_data = pool_data["fees"]
     history = pool_data["history"]
+    manual = pool_data["manual"]
     
     nft_id = pool_entry["nft_id"]
     
@@ -67,21 +73,30 @@ def calc_metrics(pool_entry, pool_data):
     price_upper = pos.get('price_upper', 0)
     price_current = pos.get('price_current', 0)
     
-    # Config values (from pools.json or per-pool config)
+    # Config values
     total_invested = pool_entry.get("total_invested_usd", config.get("total_invested_usd", 0))
     deposit_date = pool_entry.get("deposit_date", config.get("deposit_date", "2025-01-01"))
-    initial_cbbtc_price = pool_entry.get("initial_cbbtc_price", config.get("initial_cbbtc_price", 97000))
+    initial_price0 = pool_entry.get("initial_cbbtc_price", config.get("initial_cbbtc_price", 0)) or pos.get('price0_usd', 0)
     
-    # Fees
-    collected_usdc = fees_data.get('total_collected_usdc', 0)
-    collected_cbbtc = fees_data.get('total_collected_cbbtc', 0)
-    fees_collected_value = (collected_usdc * 1.0) + (collected_cbbtc * price_cbbtc)
+    network = pos.get('network', 'base').capitalize()
+    exchange = pos.get('exchange', 'uniswap_v3').replace('_', ' ').title()
+
+    # Fees (Normalized)
+    collected_0 = fees_data.get('total_collected_usdc', 0) # Legacy field name
+    collected_1 = fees_data.get('total_collected_cbbtc', 0) # Legacy field name
+    fees_collected_value = (collected_0 * 1.0) + (collected_1 * price_current)
     
     unclaimed_0 = pos.get('unclaimed_0', 0)
     unclaimed_1 = pos.get('unclaimed_1', 0)
-    pending_usdc = unclaimed_0 / 1e6
-    pending_cbbtc = unclaimed_1 / 1e8
-    fees_usd = (pending_usdc * 1.0) + (pending_cbbtc * price_cbbtc)
+    
+    # Decimals handling (dynamic fallback)
+    dec0 = 6 if symbol0 == "USDC" else 8 if symbol0 == "cbBTC" else 9 if symbol0 == "SOL" else 18
+    dec1 = 6 if symbol1 == "USDC" else 8 if symbol1 == "cbBTC" else 9 if symbol1 == "SOL" else 18
+    
+    pending_0 = unclaimed_0 / (10**6) if symbol0 == "USDC" else unclaimed_0 / (10**8) # Simplified
+    pending_1 = unclaimed_1 / (10**8) if symbol1 == "cbBTC" else unclaimed_1 / (10**6) # Simplified
+    
+    fees_usd = pos.get('collected_usd', 0) or ((pending_0 * 1.0) + (pending_1 * price_current))
     total_fees = fees_usd + fees_collected_value
     
     # Position Age
@@ -94,21 +109,26 @@ def calc_metrics(pool_entry, pool_data):
     roi_percent = (net_pnl / total_invested) * 100 if total_invested > 0 else 0
     
     # APRs
-    fee_apr = calculate_fee_apr(total_fees, total_invested, position_age_days)
+    fee_apr = pos.get('apr', calculate_fee_apr(total_fees, total_invested, position_age_days))
     total_apr = (roi_percent / position_age_days) * 365 if position_age_days > 0 else 0
     
     # IL
-    price_ratio = price_cbbtc / initial_cbbtc_price if initial_cbbtc_price > 0 else 1
+    price_ratio = price_current / initial_price0 if initial_price0 > 0 else 1
     il_percent = calculate_impermanent_loss(price_ratio)
     
     # LP vs HODL
-    initial_btc = (total_invested * 0.5) / initial_cbbtc_price if initial_cbbtc_price > 0 else 0
+    initial_token0 = (total_invested * 0.5) / initial_price0 if initial_price0 > 0 else 0
     initial_usdc = total_invested * 0.5
-    hodl_value = (initial_btc * price_cbbtc) + initial_usdc
+    hodl_value = (initial_token0 * price_current) + initial_usdc
     lp_vs_hodl = (value_usd + total_fees) - hodl_value
     
     # Projections
     daily_fee = total_fees / max(position_age_days, 1)
+
+    # Manual indicators
+    manual_collected_usdc = manual.get('collected_usdc') if manual else None
+    manual_collected_cbbtc = manual.get('collected_cbbtc') if manual else None
+    manual_updated = manual.get('timestamp') if manual else None
     
     # History for chart
     dates = [h.get('date', '').split(" ")[0] for h in history] if history else [now.strftime("%Y-%m-%d")]
@@ -118,13 +138,13 @@ def calc_metrics(pool_entry, pool_data):
         "nft_id": nft_id,
         "symbol0": symbol0, "symbol1": symbol1,
         "value_usd": value_usd, "amount0": amount0, "amount1": amount1,
-        "in_range": in_range, "price_cbbtc": price_cbbtc,
+        "in_range": in_range, "price0_usd": pos.get('price0_usd', 0),
         "price_lower": price_lower, "price_upper": price_upper, "price_current": price_current,
         "total_invested": total_invested, "deposit_date": deposit_date,
-        "initial_cbbtc_price": initial_cbbtc_price,
+        "initial_price": initial_price0,
         "fees_collected_value": fees_collected_value, "fees_usd": fees_usd,
-        "total_fees": total_fees, "collected_usdc": collected_usdc, "collected_cbbtc": collected_cbbtc,
-        "pending_usdc": pending_usdc, "pending_cbbtc": pending_cbbtc,
+        "total_fees": total_fees,
+        "pending_0": pending_0, "pending_1": pending_1,
         "position_age_days": position_age_days,
         "net_pnl": net_pnl, "roi_percent": roi_percent,
         "fee_apr": fee_apr, "total_apr": total_apr,
@@ -133,7 +153,12 @@ def calc_metrics(pool_entry, pool_data):
         "daily_fee": daily_fee,
         "weekly_fee": daily_fee * 7, "monthly_fee": daily_fee * 30, "yearly_fee": daily_fee * 365,
         "dates": dates, "values": values,
-        "label": pool_entry.get("label", f"Pool #{nft_id}")
+        "label": pool_entry.get("label", f"Pool #{nft_id}"),
+        "network_label": network,
+        "exchange_label": exchange,
+        "manual_collected_usdc": manual_collected_usdc,
+        "manual_collected_cbbtc": manual_collected_cbbtc,
+        "manual_updated": manual_updated
     }
 
 def generate_pool_html(m, pool_index):
@@ -155,9 +180,12 @@ def generate_pool_html(m, pool_index):
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h2 class="text-xl font-bold text-white">{m['symbol0']}/{m['symbol1']} <span class="text-sm text-gray-500">NFT #{m['nft_id']}</span></h2>
-                <p class="text-sm text-gray-500">Base Network | Uniswap V3 | Fee: 0.05%</p>
+                <p class="text-sm text-gray-500">{m['network_label']} | {m['exchange_label']}</p>
             </div>
             <div class="flex items-center gap-3">
+                <button onclick="openManualModal('{m['nft_id']}')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-md border border-gray-700 transition">
+                    ⚙️ Manual Backup
+                </button>
                 <span class="{range_class} text-sm font-medium">{range_status}</span>
             </div>
         </div>
@@ -206,6 +234,15 @@ def generate_pool_html(m, pool_index):
                     <span>collected: <span class="text-gray-300">${m['fees_collected_value']:,.2f}</span></span> |
                     <span>pending: <span class="text-gray-300">${m['fees_usd']:,.2f}</span></span>
                 </div>
+                {f'''
+                <div class="mt-2 pt-2 border-t border-gray-800">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Backup Manual (Self-Reported)</p>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-yellow-500/80">{m['symbol1']}: {m.get('manual_collected_usdc') or 0:,.2f}</span>
+                        <span class="text-yellow-500/80">{m['symbol0']}: {m.get('manual_collected_cbbtc') or 0:,.6f}</span>
+                    </div>
+                </div>
+                ''' if m.get('manual_updated') else ''}
             </div>
             <div class="card p-5">
                 <p class="text-gray-500 text-xs mb-1">LP vs HODL</p>
@@ -215,8 +252,8 @@ def generate_pool_html(m, pool_index):
                 <p class="text-xs text-gray-500">HODL: ${m['hodl_value']:,.2f}</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">cbBTC Price</p>
-                <p class="text-2xl font-bold text-white">${m['price_cbbtc']:,.0f}</p>
+                <p class="text-gray-500 text-xs mb-1">{m['symbol0']} Price</p>
+                <p class="text-2xl font-bold text-white">${m['price0_usd']:,.2f}</p>
                 <p class="text-xs {'text-accent' if m['price_ratio'] >= 1 else 'text-danger'}">
                     {'+' if m['price_ratio'] >= 1 else ''}{((m['price_ratio'] - 1) * 100):.1f}% since deposit
                 </p>
@@ -238,8 +275,8 @@ def generate_pool_html(m, pool_index):
                 <p class="text-xl font-bold text-white">{m['deposit_date']}</p>
             </div>
             <div class="card p-5">
-                <p class="text-gray-500 text-xs mb-1">Initial cbBTC Price</p>
-                <p class="text-xl font-bold text-white">${m['initial_cbbtc_price']:,.0f}</p>
+                <p class="text-gray-500 text-xs mb-1">Initial {m['symbol0']} Price</p>
+                <p class="text-xl font-bold text-white">${m['initial_price']:,.2f}</p>
             </div>
         </div>
 
@@ -259,7 +296,7 @@ def generate_pool_html(m, pool_index):
                 </div>
             </div>
             <div class="card p-5">
-                <h3 class="text-sm text-gray-400 mb-4">Price Range (cbBTC/USDC)</h3>
+                <h3 class="text-sm text-gray-400 mb-4">Price Range ({m['symbol0']}/{m['symbol1']})</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-gray-300">MIN</span>
@@ -526,6 +563,40 @@ def main():
         </div>
     </div>
 
+    <!-- Manual Input Modal -->
+    <div id="manualModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="card w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-white">Manual Backup Input</h3>
+                <button onclick="closeManualModal()" class="text-gray-500 hover:text-white">✕</button>
+            </div>
+            
+            <form id="manualForm" onsubmit="submitManual(event)" class="space-y-4">
+                <input type="hidden" id="modalNftId" name="nft_id">
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 uppercase font-bold">Total Collected USDC</label>
+                    <input type="number" step="any" id="modalUsdc" name="collected_usdc" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 uppercase font-bold">Total Collected cbBTC</label>
+                    <input type="number" step="any" id="modalCbbtc" name="collected_cbbtc" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500" required>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" id="manualSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                        Save Backup Data
+                    </button>
+                </div>
+                
+                <p class="text-[10px] text-gray-600 italic mt-2">
+                    * This data will be saved locally as a reference. It does not overwrite blockchain sync records.
+                </p>
+            </form>
+        </div>
+    </div>
+
     <script>
         const charts = {{}};
         
@@ -542,6 +613,54 @@ def main():
             // Resize chart (needed after display change)
             if (charts[nftId]) {{
                 setTimeout(() => charts[nftId].resize(), 50);
+            }}
+        }}
+
+        function openManualModal(nftId) {{
+            document.getElementById('modalNftId').value = nftId;
+            document.getElementById('modalUsdc').value = ''; // Clear previous values
+            document.getElementById('modalCbbtc').value = ''; // Clear previous values
+            document.getElementById('manualModal').style.display = 'flex';
+        }}
+
+        function closeManualModal() {{
+            document.getElementById('manualModal').style.display = 'none';
+        }}
+
+        async function submitManual(event) {{
+            event.preventDefault();
+            const btn = document.getElementById('manualSubmitBtn');
+            const nftId = document.getElementById('modalNftId').value;
+            const usdc = document.getElementById('modalUsdc').value;
+            const cbbtc = document.getElementById('modalCbbtc').value;
+            
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+            
+            try {{
+                const response = await fetch('/api/manual', {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{
+                        nft_id: nftId,
+                        collected_usdc: parseFloat(usdc),
+                        collected_cbbtc: parseFloat(cbbtc),
+                        timestamp: new Date().toISOString()
+                    }})
+                }});
+                
+                const data = await response.json();
+                if (data.success) {{
+                    alert('Manual data saved!');
+                    window.location.reload();
+                }} else {{
+                    alert('Error: ' + data.message);
+                }}
+            }} catch (error) {{
+                alert('Request failed: ' + error.message);
+            }} finally {{
+                btn.innerHTML = 'Save Backup Data';
+                btn.disabled = false;
             }}
         }}
 

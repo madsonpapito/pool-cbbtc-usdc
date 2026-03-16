@@ -1,7 +1,12 @@
 {
-    "nft_id": 4660395,
-    "total_collected_usdc": 0.0,
-    "total_collected_cbbtc": 0.0,
-    "events_count": 0,
-    "last_updated": "2026-02-20 11:15:00"
+  "nft_id": 4660395,
+  "total_collected_usdc": 6.890558000000001,
+  "total_collected_cbbtc": 0.00010021,
+  "raw_collected_usdc": 6.890558000000001,
+  "raw_collected_cbbtc": 0.00010021,
+  "withdrawn_usdc": 0,
+  "withdrawn_cbbtc": 0,
+  "events_count": 4,
+  "last_synced_block": 43441728,
+  "last_updated": "2026-03-16 14:53:59"
 }

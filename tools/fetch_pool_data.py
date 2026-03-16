@@ -3,12 +3,16 @@ import json
 import sys
 import os
 from decimal import Decimal, getcontext
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Set high precision for V3 math
 getcontext().prec = 50
 
 # Configuration
-RPC_URL = "https://mainnet.base.org"
+RPC_URL = os.getenv("RPC_URL", "https://mainnet.base.org")
 MANAGER_ADDRESS = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1"
 
 # Token Info (known tokens on Base)
